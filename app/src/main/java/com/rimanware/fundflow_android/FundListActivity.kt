@@ -21,11 +21,12 @@ class FundListActivity : AppCompatActivity() {
 
         listItems.layoutManager = LinearLayoutManager(this)
 
-        listItems.adapter = FundRecyclerAdapter(this, DataManager.funds())
+        listItems.adapter = FundRecyclerAdapter(this) { -> DataManager.funds() }
 
     }
 
     override fun onResume() {
         super.onResume()
+        listItems.adapter?.notifyDataSetChanged()
     }
 }

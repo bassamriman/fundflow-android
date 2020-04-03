@@ -33,7 +33,13 @@ dependencies {
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     implementation "io.arrow-kt:arrow-mtl-data:$arrow_version"
     implementation "io.arrow-kt:arrow-core-data:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.navigation:navigation-fragment:2.0.0'
+    implementation 'androidx.navigation:navigation-ui:2.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.0.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.0.0'
+    kapt "io.arrow-kt:arrow-meta:$arrow_version"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
