@@ -21,7 +21,8 @@ class FundListActivity : AppCompatActivity() {
 
         listItems.layoutManager = LinearLayoutManager(this)
 
-        listItems.adapter = FundRecyclerAdapter(this) { -> DataManager.funds() }
+        listItems.adapter =
+            FundRecyclerAdapter(this) { -> DataManager.funds() }
 
     }
 

@@ -20,6 +20,7 @@ object DataManager {
     }
 
     fun funds(): List<Fund> = funds.values.toList()
+    fun fundMap(): Map<FundRef, Fund> = funds
     fun getFundByRefId(id: String): Option<Fund> = getFundByRef(FundRef(id))
     fun getFundByRef(ref: FundRef): Option<Fund> = funds.getOption(ref)
     fun save(fund: Fund) {

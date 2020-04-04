@@ -3,41 +3,22 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/mobile_navigation"
-            app:startDestination="@+id/nav_home">
+            app:startDestination="@+id/nav_fund_list">
 
     <fragment
-            android:id="@+id/nav_home"
-            android:name="com.rimanware.fundflow_android.ui.home.HomeFragment"
-            android:label="@string/menu_home"
-            tools:layout="@layout/fragment_home"/>
+            android:id="@+id/nav_fund_list"
+            android:name="com.rimanware.fundflow_android.ui.fund_list.FundListFragment"
+            android:label="@string/menu_fund_list"
+            tools:layout="@layout/fragment_fund_list">
+        <action android:id="@+id/action_nav_fund_list_to_nav_fund_edit" app:destination="@id/nav_fund_edit"/>
+    </fragment>
 
     <fragment
-            android:id="@+id/nav_gallery"
-            android:name="com.rimanware.fundflow_android.ui.gallery.GalleryFragment"
-            android:label="@string/menu_gallery"
-            tools:layout="@layout/fragment_gallery"/>
+            android:id="@+id/nav_fund_edit"
+            android:name="com.rimanware.fundflow_android.ui.fund_edit.FundEditFragment"
+            android:label="@string/menu_fund_edit"
+            tools:layout="@layout/fragment_fund_edit">
+        <argument android:name="selectedFund" app:argType="string"/>
+    </fragment>
 
-    <fragment
-            android:id="@+id/nav_slideshow"
-            android:name="com.rimanware.fundflow_android.ui.slideshow.SlideshowFragment"
-            android:label="@string/menu_slideshow"
-            tools:layout="@layout/fragment_slideshow"/>
-
-    <fragment
-            android:id="@+id/nav_tools"
-            android:name="com.rimanware.fundflow_android.ui.tools.ToolsFragment"
-            android:label="@string/menu_tools"
-            tools:layout="@layout/fragment_tools"/>
-
-    <fragment
-            android:id="@+id/nav_share"
-            android:name="com.rimanware.fundflow_android.ui.share.ShareFragment"
-            android:label="@string/menu_share"
-            tools:layout="@layout/fragment_share"/>
-
-    <fragment
-            android:id="@+id/nav_send"
-            android:name="com.rimanware.fundflow_android.ui.send.SendFragment"
-            android:label="@string/menu_send"
-            tools:layout="@layout/fragment_send"/>
 </navigation>
