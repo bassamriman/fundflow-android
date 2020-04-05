@@ -35,11 +35,6 @@ class ItemsActivity : AppCompatActivity() {
                 R.id.nav_tools, R.id.nav_share, R.id.nav_send
             ), drawerLayout
         )
-        val fab: FloatingActionButton = findViewById(R.id.fab)
-
-        fab.setOnClickListener {
-            navController.nav
-        }
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)

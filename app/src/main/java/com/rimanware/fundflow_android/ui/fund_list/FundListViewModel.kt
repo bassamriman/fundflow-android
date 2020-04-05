@@ -8,9 +8,17 @@ import fundflow.Fund
 
 class FundListViewModel : ViewModel() {
 
-    private val _funds = MutableLiveData<List<Fund>>().apply {
-        value = DataManager.funds()
+    private val _funds by lazy {
+        MutableLiveData<List<Fund>>().apply {
+            value = DataManager.funds()
+        }
     }
 
     val funds: LiveData<List<Fund>> = _funds
+
+    fun updateFundList(): Unit {
+        _funds.apply {
+            value = DataManager.funds()
+        }
+    }
 }

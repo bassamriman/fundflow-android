@@ -7,25 +7,80 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.navArgs
+import arrow.core.getOrElse
+import arrow.core.toOption
+import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
+import com.rimanware.fundflow_android.ui.fund_list.FundListViewModel
+import fundflow.Fund
 
 class FundEditFragment : Fragment() {
 
     private lateinit var fundEditViewModel: FundEditViewModel
+    private lateinit var selectedFund: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        fundEditViewModel =
-            ViewModelProviders.of(this).get(FundEditViewModel::class.java)
+        fundEditViewModel = ViewModelProvider(this).get(FundEditViewModel::class.java)
+
         val root = inflater.inflate(R.layout.fragment_fund_edit, container, false)
-        val textView: TextView = root.findViewById(R.id.text_gallery)
-        fundEditViewModel.text.observe(this, Observer {
-            textView.text = it
+
+        val titleView: TextView = root.findViewById(R.id.textFundTitle)
+        val descriptionView: TextView = root.findViewById(R.id.textFundText)
+
+        fundEditViewModel.title.observe(this, Observer {
+            titleView.text = it
         })
+
+        fundEditViewModel.description.observe(this, Observer {
+            descriptionView.text = it
+        })
+
+        val safeArgs: FundEditFragmentArgs by navArgs()
+        selectedFund = safeArgs.selectedFund
+
+        fundEditViewModel.selectFund(getFundOrDefault(selectedFund))
+
         return root
+    }
+
+    private fun selectedFundOrDefault(): Fund =
+        getFundOrDefault(selectedFund)
+
+    private fun getFundOrDefault(id: String): Fund =
+        DataManager.getFundByRefId(id).getOrElse { Fund.empty() }
+
+    override fun onPause() {
+        super.onPause()
+        saveFund(selectedFundOrDefault())
+    }
+
+    private fun saveFund(fund: Fund) {
+        val root = view.toOption()
+        root.map {
+            val titleView: TextView = it.findViewById(R.id.textFundTitle)
+            val descriptionView: TextView = it.findViewById(R.id.textFundText)
+            if (titleView.text.toString().isNotEmpty()) {
+                DataManager.save(
+                    fund.copy(
+                        name = titleView.text.toString(),
+                        description = descriptionView.text.toString()
+                    )
+                )
+                val fundListViewModel =
+                    activity?.run {
+                        ViewModelProvider(this).get(FundListViewModel::class.java)
+                    } ?: throw Exception("Invalid Activity")
+
+                fundListViewModel.updateFundList()
+            }
+        }
+
+
     }
 }
