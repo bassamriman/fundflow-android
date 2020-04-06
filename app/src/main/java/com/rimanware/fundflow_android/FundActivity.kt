@@ -37,7 +37,7 @@ class FundActivity : AppCompatActivity() {
 
     private fun saveFund(fund: Fund) {
         if (textFundTitle.text.toString().isNotEmpty()) {
-            DataManager.save(
+            DataManager.addFund(
                 fund.copy(
                     name = textFundTitle.text.toString(),
                     description = textFundText.text.toString()

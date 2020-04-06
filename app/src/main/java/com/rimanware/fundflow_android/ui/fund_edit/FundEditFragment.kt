@@ -66,7 +66,7 @@ class FundEditFragment : Fragment() {
             val titleView: TextView = it.findViewById(R.id.textFundTitle)
             val descriptionView: TextView = it.findViewById(R.id.textFundText)
             if (titleView.text.toString().isNotEmpty()) {
-                DataManager.save(
+                DataManager.addFund(
                     fund.copy(
                         name = titleView.text.toString(),
                         description = descriptionView.text.toString()

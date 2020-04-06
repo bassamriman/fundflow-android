@@ -24,4 +24,54 @@
             android:hint="Fund Title" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="8dp" android:layout_marginEnd="8dp" android:layout_marginTop="12dp"/>
+    <TextView
+            android:text="Fund Flow"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textFundFlowTitle"
+            app:layout_constraintTop_toBottomOf="@+id/textFundText" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp" android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_marginTop="12dp"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" android:id="@+id/textFundFlowValue"
+            app:layout_constraintStart_toEndOf="@+id/textFundFlowTitle"
+            app:layout_constraintTop_toBottomOf="@+id/textFundText" app:layout_constraintEnd_toEndOf="parent"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" android:layout_marginTop="12dp"/>
+    <TextView
+            android:text="In Flow"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textInFlowTitle"
+            app:layout_constraintTop_toBottomOf="@+id/textFundFlowTitle" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp" android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_marginTop="12dp"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" android:id="@+id/textInFlowValue"
+            app:layout_constraintStart_toEndOf="@+id/textInFlowTitle"
+            app:layout_constraintTop_toBottomOf="@+id/textFundFlowValue" app:layout_constraintEnd_toEndOf="parent"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_marginEnd="8dp" android:layout_marginStart="8dp" android:layout_marginTop="12dp"/>
+    <TextView
+            android:text="Out Flow"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textOutFlowTitle"
+            app:layout_constraintTop_toBottomOf="@+id/textInFlowTitle" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp" android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_marginTop="12dp"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textOutFlowValue"
+            app:layout_constraintStart_toEndOf="@+id/textOutFlowTitle"
+            app:layout_constraintTop_toBottomOf="@+id/textInFlowValue" app:layout_constraintEnd_toEndOf="parent"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_marginEnd="8dp" android:layout_marginStart="8dp" android:layout_marginTop="12dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

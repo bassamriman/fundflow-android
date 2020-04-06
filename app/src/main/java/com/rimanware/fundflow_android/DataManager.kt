@@ -4,26 +4,25 @@ import arrow.core.Option
 import arrow.core.getOption
 import fundflow.Fund
 import fundflow.FundRef
+import fundflow.ledgers.RecurrentTransactionFundView
+import fundflow.ledgers.RecurrentTransactionLedgerContext
+import fundflow.ledgers.RecurrentTransactionLedgerContextAPI
 
 object DataManager {
-    private var funds: Map<FundRef, Fund> = emptyMap()
+    private var recurrentTransactionLedgerContext = RecurrentTransactionLedgerContext.empty()
+    private var fundViews: Map<FundRef, RecurrentTransactionFundView> =
+        RecurrentTransactionLedgerContextAPI.run { recurrentTransactionLedgerContext.viewAll() }
 
-    init {
-        funds = initialFunds()
-    }
-
-    private fun initialFunds(): Map<FundRef, Fund> {
-        val carFund = Fund("Car Fund", "Money saved for car")
-        val homeFund = Fund("Home Fund", "Money saved for home")
-
-        return funds + Pair(carFund.reference, carFund) + Pair(homeFund.reference, homeFund)
-    }
-
-    fun funds(): List<Fund> = funds.values.toList()
-    fun fundMap(): Map<FundRef, Fund> = funds
+    fun fundMap(): Map<FundRef, Fund> = recurrentTransactionLedgerContext.funds
+    fun funds(): List<Fund> = fundMap().values.toList()
     fun getFundByRefId(id: String): Option<Fund> = getFundByRef(FundRef(id))
-    fun getFundByRef(ref: FundRef): Option<Fund> = funds.getOption(ref)
-    fun save(fund: Fund) {
-        funds = funds + Pair(fund.reference, fund)
+    fun getFundByRef(ref: FundRef): Option<Fund> = fundMap().getOption(ref)
+    fun addFund(fund: Fund) {
+        recurrentTransactionLedgerContext = RecurrentTransactionLedgerContextAPI.run {
+            recurrentTransactionLedgerContext.addFund(fund)
+        }
+        fundViews = RecurrentTransactionLedgerContextAPI.run { recurrentTransactionLedgerContext.viewAll() }
     }
+
+
 }
