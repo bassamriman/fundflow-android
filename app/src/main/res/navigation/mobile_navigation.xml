@@ -21,4 +21,12 @@
         <argument android:name="selectedFund" app:argType="string"/>
     </fragment>
 
+    <fragment
+            android:id="@+id/recurrent_transaction_edit"
+            android:name="com.rimanware.fundflow_android.ui.recurrent_transaction_edit.RecurrentTransactionEditFragment"
+            android:label="@string/menu_fund_edit"
+            tools:layout="@layout/fragment_recurrent_transaction_edit">
+        <argument android:name="selectedRecurrentTransaction" app:argType="string"/>
+    </fragment>
+
 </navigation>

@@ -32,6 +32,9 @@ class FundEditFragment : Fragment() {
 
         val titleView: TextView = root.findViewById(R.id.textFundTitle)
         val descriptionView: TextView = root.findViewById(R.id.textFundText)
+        val fundFlowView: TextView = root.findViewById(R.id.textFundFlowValue)
+        val inFlowView: TextView = root.findViewById(R.id.textInFlowValue)
+        val outFlowView: TextView = root.findViewById(R.id.textOutFlowValue)
 
         fundEditViewModel.title.observe(this, Observer {
             titleView.text = it
@@ -39,6 +42,18 @@ class FundEditFragment : Fragment() {
 
         fundEditViewModel.description.observe(this, Observer {
             descriptionView.text = it
+        })
+
+        fundEditViewModel.fundFlow.observe(this, Observer {
+            fundFlowView.text = "$it"
+        })
+
+        fundEditViewModel.inFlow.observe(this, Observer {
+            inFlowView.text = "$it"
+        })
+
+        fundEditViewModel.outFlow.observe(this, Observer {
+            outFlowView.text = "$it"
         })
 
         val safeArgs: FundEditFragmentArgs by navArgs()
