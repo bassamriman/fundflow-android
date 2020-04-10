@@ -1,32 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/mobile_navigation"
-            app:startDestination="@+id/nav_fund_list">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_fund_list">
 
     <fragment
-            android:id="@+id/nav_fund_list"
-            android:name="com.rimanware.fundflow_android.ui.fund_list.FundListFragment"
-            android:label="@string/menu_fund_list"
-            tools:layout="@layout/fragment_fund_list">
-        <action android:id="@+id/action_nav_fund_list_to_nav_fund_edit" app:destination="@id/nav_fund_edit"/>
+        android:id="@+id/nav_fund_list"
+        android:name="com.rimanware.fundflow_android.ui.fund_list.FundListFragment"
+        android:label="@string/menu_fund_list"
+        tools:layout="@layout/fragment_fund_list">
+        <action
+            android:id="@+id/action_nav_fund_list_to_nav_fund_edit"
+            app:destination="@id/nav_fund_edit" />
     </fragment>
 
     <fragment
-            android:id="@+id/nav_fund_edit"
-            android:name="com.rimanware.fundflow_android.ui.fund_edit.FundEditFragment"
-            android:label="@string/menu_fund_edit"
-            tools:layout="@layout/fragment_fund_edit">
-        <argument android:name="selectedFund" app:argType="string"/>
+        android:id="@+id/nav_fund_edit"
+        android:name="com.rimanware.fundflow_android.ui.fund_edit.FundEditFragment"
+        android:label="@string/menu_fund_edit"
+        tools:layout="@layout/fragment_fund_edit">
+        <argument
+            android:name="selectedFund"
+            app:argType="string" />
     </fragment>
 
     <fragment
-            android:id="@+id/recurrent_transaction_edit"
-            android:name="com.rimanware.fundflow_android.ui.recurrent_transaction_edit.RecurrentTransactionEditFragment"
-            android:label="@string/menu_fund_edit"
-            tools:layout="@layout/fragment_recurrent_transaction_edit">
-        <argument android:name="selectedRecurrentTransaction" app:argType="string"/>
+        android:id="@+id/nav_recurrent_transaction_edit"
+        android:name="com.rimanware.fundflow_android.ui.recurrent_transaction_edit.RecurrentTransactionEditFragment"
+        android:label="@string/menu_fund_edit"
+        tools:layout="@layout/fragment_recurrent_transaction_edit">
+        <argument
+            android:name="selectedRecurrentTransaction"
+            app:argType="string" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_recurrent_transaction_list"
+        android:name="com.rimanware.fundflow_android.ui.recurrent_transaction_list.RecurrentTransactionListFragment"
+        android:label="@string/menu_recurrent_transaction_list"
+        tools:layout="@layout/fragment_recurrent_transaction_list">
+        <action
+            android:id="@+id/action_nav_recurrent_transaction_list_to_nav_recurrent_transaction_edit"
+            app:destination="@+id/nav_recurrent_transaction_edit" />
+    </fragment>
+
 
 </navigation>

@@ -68,7 +68,7 @@ class FundEditFragment : Fragment() {
         getFundOrDefault(selectedFund)
 
     private fun getFundOrDefault(id: String): Fund =
-        DataManager.getFundByRefId(id).getOrElse { Fund.empty() }
+        DataManager.loadFundUsingRefId(id).getOrElse { Fund.empty() }
 
     override fun onPause() {
         super.onPause()
@@ -81,7 +81,7 @@ class FundEditFragment : Fragment() {
             val titleView: TextView = it.findViewById(R.id.textFundTitle)
             val descriptionView: TextView = it.findViewById(R.id.textFundText)
             if (titleView.text.toString().isNotEmpty()) {
-                DataManager.addFund(
+                DataManager.saveFund(
                     fund.copy(
                         name = titleView.text.toString(),
                         description = descriptionView.text.toString()

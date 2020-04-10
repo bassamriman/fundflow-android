@@ -10,7 +10,7 @@ class FundListViewModel : ViewModel() {
 
     private val _funds by lazy {
         MutableLiveData<List<Fund>>().apply {
-            value = DataManager.funds()
+            value = DataManager.loadAllFunds()
         }
     }
 
@@ -18,7 +18,7 @@ class FundListViewModel : ViewModel() {
 
     fun updateFundList(): Unit {
         _funds.apply {
-            value = DataManager.funds()
+            value = DataManager.loadAllFunds()
         }
     }
 }

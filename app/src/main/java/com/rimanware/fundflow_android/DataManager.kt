@@ -11,38 +11,45 @@ import fundflow.ledgers.RecurrentTransactionLedgerContextAPI
 import ledger.TransactionRef
 
 object DataManager {
-    private var recurrentTransactionLedgerContext = RecurrentTransactionLedgerContext.empty()
-    private var fundViews: Map<FundRef, RecurrentTransactionFundView> =
+    var recurrentTransactionLedgerContext = RecurrentTransactionLedgerContext.empty()
+    var fundViews: Map<FundRef, RecurrentTransactionFundView> =
         RecurrentTransactionLedgerContextAPI.run { recurrentTransactionLedgerContext.viewAll() }
 
-    fun fundMap(): Map<FundRef, Fund> = recurrentTransactionLedgerContext.funds
-    fun transactionMap(): Map<TransactionRef, RecurrentTransaction> =
-        recurrentTransactionLedgerContext.recurrentTransactionLedger.transactions.map { it.transactionRef to it }
-            .toMap()
+    //Fund
+    private fun fundMap(): Map<FundRef, Fund> = recurrentTransactionLedgerContext.funds
+    fun loadAllFunds(): List<Fund> = fundMap().values.toList()
 
-    fun funds(): List<Fund> = fundMap().values.toList()
-    fun getFundByRefId(id: String): Option<Fund> = getFundByRef(FundRef(id))
-    fun getFundByRef(ref: FundRef): Option<Fund> = fundMap().getOption(ref)
-    fun getRecurrentTransactionByRefId(id: String): Option<RecurrentTransaction> =
-        getRecurrentTransactionByRef(TransactionRef(id))
+    fun loadFundUsingRefId(id: String): Option<Fund> = loadFundUsingRef(FundRef(id))
+    fun loadFundUsingRef(ref: FundRef): Option<Fund> = fundMap().getOption(ref)
+    fun loadFundView(ref: FundRef): Option<RecurrentTransactionFundView> = fundViews.getOption(ref)
 
-    fun getRecurrentTransactionByRef(ref: TransactionRef): Option<RecurrentTransaction> =
-        transactionMap().getOption(ref)
-
-    fun fundView(ref: FundRef): Option<RecurrentTransactionFundView> = fundViews.getOption(ref)
-    fun addFund(fund: Fund) {
+    fun saveFund(fund: Fund) {
         recurrentTransactionLedgerContext = RecurrentTransactionLedgerContextAPI.run {
             recurrentTransactionLedgerContext.addFund(fund)
         }
-        fundViews = RecurrentTransactionLedgerContextAPI.run { recurrentTransactionLedgerContext.viewAll() }
+        fundViews =
+            RecurrentTransactionLedgerContextAPI.run { recurrentTransactionLedgerContext.viewAll() }
     }
 
-    fun addRecurrentTransaction(recurrentTransaction: RecurrentTransaction) {
+    //RecurrentTransaction
+    private fun recurrentTransactionMap(): Map<TransactionRef, RecurrentTransaction> =
+        recurrentTransactionLedgerContext.recurrentTransactionLedger.transactions.map { it.reference to it }
+            .toMap()
+
+    fun loadAllRecurrentTransactions(): List<RecurrentTransaction> =
+        recurrentTransactionMap().values.toList()
+
+    fun loadRecurrentTransactionUsingRefId(id: String): Option<RecurrentTransaction> =
+        loadRecurrentTransactionUsingRef(TransactionRef(id))
+
+    fun loadRecurrentTransactionUsingRef(ref: TransactionRef): Option<RecurrentTransaction> =
+        recurrentTransactionMap().getOption(ref)
+
+    fun saveRecurrentTransaction(recurrentTransaction: RecurrentTransaction) {
         recurrentTransactionLedgerContext = RecurrentTransactionLedgerContextAPI.run {
             recurrentTransactionLedgerContext.addRecurrentTransaction(recurrentTransaction)
         }
-        fundViews = RecurrentTransactionLedgerContextAPI.run { recurrentTransactionLedgerContext.viewAll() }
+        fundViews =
+            RecurrentTransactionLedgerContextAPI.run { recurrentTransactionLedgerContext.viewAll() }
     }
-
-
 }

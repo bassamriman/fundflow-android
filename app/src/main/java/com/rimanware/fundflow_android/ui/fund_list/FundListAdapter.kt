@@ -46,7 +46,7 @@ class FundListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     init {
         itemView.setOnClickListener {
             val action =
-                FundListFragmentDirections.actionNavFundListToNavFundEdit(DataManager.funds()[adapterPosition].reference.id)
+                FundListFragmentDirections.actionNavFundListToNavFundEdit(DataManager.loadAllFunds()[adapterPosition].reference.id)
             itemView.findNavController().navigate(action)
         }
     }

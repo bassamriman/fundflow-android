@@ -17,43 +17,38 @@ import arrow.core.toOption
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
 import com.rimanware.fundflow_android.ui.fund_list.FundListViewModel
+import com.rimanware.fundflow_android.ui.recurrent_transaction_list.RecurrentTransactionListViewModel
 import common.Daily
 import common.DateTimeInterval
-import common.DateTimeIntervalAPI
 import fundflow.DailyFlow
-import fundflow.DailyFlowOps
 import fundflow.Fund
-import fundflow.FundRef
 import fundflow.ledgers.RecurrentTransaction
 import fundflow.ledgers.RecurrentTransactionDetail
 import fundflow.ledgers.RecurrentTransactionQuantification
 import ledger.TransactionCoordinates
 import java.math.BigDecimal
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class RecurrentTransactionEditFragment : Fragment() {
 
-    private lateinit var recurrentTransactionViewModel: RecurrentTransactionViewModel
+    private lateinit var recurrentTransactionEditViewModel: RecurrentTransactionEditViewModel
     private lateinit var selectedRecurrentTransaction: String
-    private val dummyTransaction: RecurrentTransaction = RecurrentTransaction(
-        RecurrentTransactionQuantification(flow = DailyFlowOps.ZERO),
-        RecurrentTransactionDetail(DateTimeIntervalAPI.infinite()),
-        TransactionCoordinates(FundRef(), FundRef())
-    )
-    private val dateFormat = SimpleDateFormat("dd-MM-yyyy")
-    private val timeFormat = SimpleDateFormat("hh:mm:ss")
+
+    private val dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    private val timeFormat = DateTimeFormatter.ISO_LOCAL_TIME
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        recurrentTransactionViewModel = ViewModelProvider(this).get(RecurrentTransactionViewModel::class.java)
+        recurrentTransactionEditViewModel =
+            ViewModelProvider(this).get(RecurrentTransactionEditViewModel::class.java)
 
-        val root = inflater.inflate(R.layout.fragment_fund_edit, container, false)
+        val root = inflater.inflate(R.layout.fragment_recurrent_transaction_edit, container, false)
 
         //Get the fundListViewModel
         val fundListViewModel = activity?.run {
@@ -62,7 +57,7 @@ class RecurrentTransactionEditFragment : Fragment() {
 
         //Set spinner content
         fundListViewModel.funds.observe(this, Observer {
-            recurrentTransactionViewModel.setFundList(it)
+            recurrentTransactionEditViewModel.setFundList(it)
         })
 
         val spinnerFromFund = root.findViewById<Spinner>(R.id.spinnerFromFundSelection)
@@ -73,7 +68,7 @@ class RecurrentTransactionEditFragment : Fragment() {
         val fromTimeView: TextView = root.findViewById(R.id.textFromTime)
         val toTimeView: TextView = root.findViewById(R.id.textToTime)
 
-        recurrentTransactionViewModel.spinnerFundContent.observe(this, Observer { spinnerData ->
+        recurrentTransactionEditViewModel.spinnerFundContent.observe(this, Observer { spinnerData ->
             val spinnerAdapter: ArrayAdapter<Fund> =
                 ArrayAdapter(activity!!, android.R.layout.simple_spinner_item, spinnerData)
             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -81,7 +76,7 @@ class RecurrentTransactionEditFragment : Fragment() {
             spinnerToFund.adapter = spinnerAdapter
         })
 
-        recurrentTransactionViewModel.fromFund.observe(this,
+        recurrentTransactionEditViewModel.fromFund.observe(this,
             Observer { maybeFund ->
                 val maybePosition: Option<Int> = maybeFund.flatMap { fund ->
                     val adapter: ArrayAdapter<Fund> = spinnerFromFund.adapter as ArrayAdapter<Fund>
@@ -90,7 +85,7 @@ class RecurrentTransactionEditFragment : Fragment() {
                 maybePosition.map { position -> spinnerFromFund.setSelection(position) }
             })
 
-        recurrentTransactionViewModel.toFund.observe(this,
+        recurrentTransactionEditViewModel.toFund.observe(this,
             Observer { maybeFund ->
                 val maybePosition: Option<Int> = maybeFund.flatMap { fund ->
                     val adapter: ArrayAdapter<Fund> = spinnerToFund.adapter as ArrayAdapter<Fund>
@@ -99,24 +94,24 @@ class RecurrentTransactionEditFragment : Fragment() {
                 maybePosition.map { position -> spinnerToFund.setSelection(position) }
             })
 
-        recurrentTransactionViewModel.fundFlowValue.observe(this, Observer { maybeValue ->
+        recurrentTransactionEditViewModel.fundFlowValue.observe(this, Observer { maybeValue ->
             maybeValue.map { value -> fundFlow.text = "$value" }
         })
 
-        recurrentTransactionViewModel.fromLocalDateTime.observe(this, Observer { maybeValue ->
+        recurrentTransactionEditViewModel.fromLocalDateTime.observe(this, Observer { maybeValue ->
             maybeValue.map { value ->
-                val date: String = dateFormat.format(value)
-                val time: String = timeFormat.format(value)
+                val date: String = value.toLocalDate().format(dateFormat)
+                val time: String = value.toLocalTime().format(timeFormat)
                 fromDateView.text = date
                 fromTimeView.text = time
             }
         })
 
-        recurrentTransactionViewModel.toLocalDateTime.observe(this, Observer { maybeValue ->
+        recurrentTransactionEditViewModel.toLocalDateTime.observe(this, Observer { maybeValue ->
             maybeValue.map { value ->
 
-                val date: String = dateFormat.format(value)
-                val time: String = timeFormat.format(value)
+                val date: String = value.toLocalDate().format(dateFormat)
+                val time: String = value.toLocalTime().format(timeFormat)
                 toDateView.text = date
                 toTimeView.text = time
             }
@@ -125,7 +120,7 @@ class RecurrentTransactionEditFragment : Fragment() {
         val safeArgs: RecurrentTransactionEditFragmentArgs by navArgs()
         selectedRecurrentTransaction = safeArgs.selectedRecurrentTransaction
 
-        recurrentTransactionViewModel.selectRecurrentTransaction(
+        recurrentTransactionEditViewModel.selectRecurrentTransaction(
             selectedRecurrentTransaction()
         )
 
@@ -133,7 +128,7 @@ class RecurrentTransactionEditFragment : Fragment() {
     }
 
     private fun selectedRecurrentTransaction(): Option<RecurrentTransaction> =
-        DataManager.getRecurrentTransactionByRefId(selectedRecurrentTransaction)
+        DataManager.loadRecurrentTransactionUsingRefId(selectedRecurrentTransaction)
 
     override fun onPause() {
         super.onPause()
@@ -144,55 +139,85 @@ class RecurrentTransactionEditFragment : Fragment() {
 
     private fun validateRecurrentTransactionInput(selected: Option<RecurrentTransaction>): Option<RecurrentTransaction> {
         val root = view.toOption()
-        return root.map {
+        return root.flatMap {
             val spinnerFromFund: Spinner = it.findViewById<Spinner>(R.id.spinnerFromFundSelection)
-            val selectedFromFund: Fund = spinnerFromFund.selectedItem as Fund
+            val selectedFromFund: Option<Fund> =
+                spinnerFromFund.selectedItem.toOption().map { it as Fund }
 
             val spinnerToFund: Spinner = it.findViewById<Spinner>(R.id.spinnerToFundSelection)
-            val selectedToFund: Fund = spinnerToFund.selectedItem as Fund
+            val selectedToFund: Option<Fund> =
+                spinnerToFund.selectedItem.toOption().map { it as Fund }
 
-            val fundFlow: TextView = it.findViewById(R.id.textFundFlowValue)
-            val fundFlowValue = BigDecimal(fundFlow.text.toString())
+            selectedFromFund.flatMap { fromFund: Fund ->
+                selectedToFund.map { toFund: Fund ->
 
-            val fromDateView: TextView = it.findViewById(R.id.textFromDate)
-            val selectedFromDate: LocalDate =
-                dateFormat.parse(fromDateView.text.toString()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    val fundFlow: TextView = it.findViewById(R.id.textFundFlowValue)
+                    val fundFlowValue = BigDecimal(fundFlow.text.toString())
 
-            val toDateView: TextView = it.findViewById(R.id.textToDate)
-            val selectedToDate =
-                dateFormat.parse(toDateView.text.toString()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    val fromDateView: TextView = it.findViewById(R.id.textFromDate)
+                    val selectedFromDate: LocalDate =
+                        LocalDate.parse(fromDateView.text.toString(), dateFormat)
 
-            val fromTimeView: TextView = it.findViewById(R.id.textFromTime)
-            val selectedFromTime =
-                timeFormat.parse(fromTimeView.text.toString()).toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
+                    val toDateView: TextView = it.findViewById(R.id.textToDate)
+                    val selectedToDate = LocalDate.parse(toDateView.text.toString(), dateFormat)
 
-            val toTimeView: TextView = it.findViewById(R.id.textToTime)
-            val selectedToTime =
-                timeFormat.parse(toTimeView.text.toString()).toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
+                    val fromTimeView: TextView = it.findViewById(R.id.textFromTime)
+                    val selectedFromTime = LocalTime.parse(fromTimeView.text.toString(), timeFormat)
 
-            val selectedFromDateTime = LocalDateTime.of(selectedFromDate, selectedFromTime)
-            val selectedToDateTime = LocalDateTime.of(selectedToDate, selectedToTime)
+                    val toTimeView: TextView = it.findViewById(R.id.textToTime)
+                    val selectedToTime = LocalTime.parse(toTimeView.text.toString(), timeFormat)
 
-            selected.map {
-                it.copy(
-                    quantification = RecurrentTransactionQuantification(DailyFlow(fundFlowValue, Daily)),
-                    details = RecurrentTransactionDetail(DateTimeInterval(selectedFromDateTime, selectedToDateTime)),
-                    transactionCoordinates = TransactionCoordinates(
-                        selectedFromFund.reference,
-                        selectedToFund.reference
-                    )
-                )
-            }.getOrElse {
-                RecurrentTransaction(
-                    RecurrentTransactionQuantification(DailyFlow(fundFlowValue, Daily)),
-                    RecurrentTransactionDetail(DateTimeInterval(selectedFromDateTime, selectedToDateTime)),
-                    TransactionCoordinates(selectedFromFund.reference, selectedToFund.reference)
-                )
+                    val selectedFromDateTime = LocalDateTime.of(selectedFromDate, selectedFromTime)
+                    val selectedToDateTime = LocalDateTime.of(selectedToDate, selectedToTime)
+
+                    selected.map {
+                        it.copy(
+                            quantification = RecurrentTransactionQuantification(
+                                DailyFlow(
+                                    fundFlowValue,
+                                    Daily
+                                )
+                            ),
+                            details = RecurrentTransactionDetail(
+                                DateTimeInterval(
+                                    selectedFromDateTime,
+                                    selectedToDateTime
+                                )
+                            ),
+                            transactionCoordinates = TransactionCoordinates(
+                                fromFund.reference,
+                                toFund.reference
+                            )
+                        )
+                    }.getOrElse {
+                        RecurrentTransaction(
+                            RecurrentTransactionQuantification(DailyFlow(fundFlowValue, Daily)),
+                            RecurrentTransactionDetail(
+                                DateTimeInterval(
+                                    selectedFromDateTime,
+                                    selectedToDateTime
+                                )
+                            ),
+                            TransactionCoordinates(
+                                fromFund.reference,
+                                toFund.reference
+                            )
+                        )
+                    }
+                }
             }
+
+
         }
     }
 
     private fun saveRecurrentTransaction(recurrentTransaction: RecurrentTransaction) {
-        DataManager.addRecurrentTransaction(recurrentTransaction)
+        DataManager.saveRecurrentTransaction(recurrentTransaction)
+        val recurrentTransactionViewModel =
+            activity?.run {
+                ViewModelProvider(this).get(RecurrentTransactionListViewModel::class.java)
+            } ?: throw Exception("Invalid Activity")
+
+        recurrentTransactionViewModel.updateRecurrentTransactionList()
     }
 }

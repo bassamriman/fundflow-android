@@ -18,7 +18,6 @@ class FundEditViewModel : ViewModel() {
 
     private val _description by lazy {
         MutableLiveData<String>().apply { value = "" }
-
     }
     val description: LiveData<String> by lazy { _description }
 
@@ -43,13 +42,13 @@ class FundEditViewModel : ViewModel() {
     val outFlow: LiveData<BigDecimal> by lazy { _outFlow }
 
     init {
-        selectedFund.observeForever(Observer { fund ->
-            DataManager.fundView(fund.reference).map { showFund(it) }
-        })
+        selectedFund.observeForever { fund ->
+            DataManager.loadFundView(fund.reference).map { showFund(it) }
+        }
     }
 
     private fun showFund(fundView: RecurrentTransactionFundView): Unit {
-        _title.value = fundView.fund.name
+         _title.value = fundView.fund.name
         _description.value = fundView.fund.description
         _fundFlow.value = fundView.fundSummaries.summary.fundFlow.flow.value
         _inFlow.value = fundView.fundSummaries.summary.incomingFlow.flow.value

@@ -13,10 +13,10 @@ import fundflow.ledgers.RecurrentTransaction
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-class RecurrentTransactionViewModel : ViewModel() {
+class RecurrentTransactionEditViewModel : ViewModel() {
 
     private val _spinnerFundContent by lazy {
-        MutableLiveData<List<Fund>>().apply { value = DataManager.funds() }
+        MutableLiveData<List<Fund>>().apply { value = DataManager.loadAllFunds() }
     }
     val spinnerFundContent: LiveData<List<Fund>> by lazy { _spinnerFundContent }
 
@@ -62,8 +62,8 @@ class RecurrentTransactionViewModel : ViewModel() {
     }
 
     private fun showRecurrentTransaction(recurrentTransaction: RecurrentTransaction): Unit {
-        _fromFund.value = DataManager.getFundByRef(recurrentTransaction.transactionCoordinates.source)
-        _toFund.value = DataManager.getFundByRef(recurrentTransaction.transactionCoordinates.destination)
+        _fromFund.value = DataManager.loadFundUsingRef(recurrentTransaction.transactionCoordinates.source)
+        _toFund.value = DataManager.loadFundUsingRef(recurrentTransaction.transactionCoordinates.destination)
         _fromLocalDateTime.value = Some(recurrentTransaction.details.recurrence.from)
         _toLocalDateTime.value = Some(recurrentTransaction.details.recurrence.to)
         _fundFlowValue.value = Some(recurrentTransaction.quantification.flow.value)
