@@ -1,8 +1,6 @@
 package com.rimanware.fundflow_android.ui.fund_edit
 
-import arrow.core.Invalid
-import arrow.core.Valid
-import arrow.core.Validated
+import arrow.core.*
 import arrow.core.extensions.list.foldable.exists
 import com.google.android.material.textfield.TextInputLayout
 import com.rimanware.fundflow_android.DataManager
@@ -35,9 +33,9 @@ object FundTitleAlreadyExist : ValidationError {
 object FundRules {
     fun validateFundTitleIsNotAlreadyTaken(
         newTitle: String,
-        oldTitle: String
+        oldTitle: Option<String>
     ): Validated<ValidationError, String> =
-        if (DataManager.loadAllFunds().filterNot { it.name == oldTitle }
+        if (DataManager.loadAllFunds().filterNot { it.name == oldTitle.getOrElse { "" } }
                 .exists { it.name == newTitle }) Invalid(
             FundTitleAlreadyExist
         ) else Valid(newTitle)
@@ -49,22 +47,27 @@ object FundEditValidation {
 
     fun validateFundTitle(
         newTitle: String,
-        oldTitle: String
+        oldTitle: Option<String>
     ): Validated<ValidationError, String> =
         when (val result = validateNotBiggerThan(titleCharLimit)(newTitle)) {
             is Invalid -> result
             is Valid -> FundRules.validateFundTitleIsNotAlreadyTaken(result.a, oldTitle)
         }
 
-    fun setValidateFundTitleError(
+    fun handleFundTitleValidation(
         newTitle: String,
-        oldTitle: String,
-        view: TextInputLayout
+        oldTitle: Option<String>,
+        view: TextInputLayout,
+        fundEditViewModel: FundEditViewModel
     ): Unit = when (val result = validateFundTitle(newTitle, oldTitle)) {
         is Invalid -> {
             view.error = result.e.message
+            fundEditViewModel.setTitleInput(None)
         }
-        is Valid -> view.error = null
+        is Valid -> {
+            view.error = null
+            fundEditViewModel.setTitleInput(result.toOption())
+        }
     }
 
     fun validateFundDescription(
@@ -72,13 +75,18 @@ object FundEditValidation {
     ): Validated<ValidationError, String> =
         validateNotBiggerThan(descriptionCharLimit)(newDescription)
 
-    fun setValidateFundDescriptionError(
+    fun handleFundDescriptionValidation(
         newDescription: String,
-        view: TextInputLayout
+        view: TextInputLayout,
+        fundEditViewModel: FundEditViewModel
     ): Unit = when (val result = validateFundDescription(newDescription)) {
         is Invalid -> {
             view.error = result.e.message
+            fundEditViewModel.setValidDescriptionInput(None)
         }
-        is Valid -> view.error = null
+        is Valid -> {
+            view.error = null
+            fundEditViewModel.setValidDescriptionInput(result.toOption())
+        }
     }
 }

@@ -3,58 +3,68 @@ package com.rimanware.fundflow_android.ui.fund_edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import com.rimanware.fundflow_android.DataManager
 import fundflow.Fund
 import fundflow.ledgers.RecurrentTransactionFundView
-import java.math.BigDecimal
 
 class FundEditViewModel : ViewModel() {
 
-    private val _title by lazy {
-        MutableLiveData<String>().apply { value = "" }
-    }
-    val title: LiveData<String> by lazy { _title }
-
-    private val _description by lazy {
-        MutableLiveData<String>().apply { value = "" }
-    }
-    val description: LiveData<String> by lazy { _description }
-
+    //Selected Fund Bindings
     private val _selectedFund by lazy {
-        MutableLiveData<Fund>().apply { value = Fund.empty() }
+        MutableLiveData<Option<Fund>>().apply { value = None }
     }
-    private val selectedFund: LiveData<Fund> by lazy { _selectedFund }
+    private val selectedFund: LiveData<Option<Fund>> by lazy { _selectedFund }
 
-    private val _fundFlow by lazy {
-        MutableLiveData<BigDecimal>().apply { value = BigDecimal.ZERO }
+    private val _titleOfSelectedFund by lazy {
+        MutableLiveData<Option<String>>().apply { value = None }
     }
-    val fundFlow: LiveData<BigDecimal> by lazy { _fundFlow }
+    val titleOfSelectedFund: LiveData<Option<String>> by lazy { _titleOfSelectedFund }
 
-    private val _inFlow by lazy {
-        MutableLiveData<BigDecimal>().apply { value = BigDecimal.ZERO }
+    private val _descriptionOfSelectedFund by lazy {
+        MutableLiveData<Option<String>>().apply { value = None }
     }
-    val inFlow: LiveData<BigDecimal> by lazy { _inFlow }
-
-    private val _outFlow by lazy {
-        MutableLiveData<BigDecimal>().apply { value = BigDecimal.ZERO }
-    }
-    val outFlow: LiveData<BigDecimal> by lazy { _outFlow }
+    val descriptionOfSelectedFund: LiveData<Option<String>> by lazy { _descriptionOfSelectedFund }
 
     init {
-        selectedFund.observeForever { fund ->
-            DataManager.loadFundView(fund.reference).map { showFund(it) }
+        selectedFund.observeForever { maybeFund ->
+            maybeFund.map { fund: Fund ->
+                DataManager.loadFundView(fund.reference).map { showFund(it) }
+            }
         }
     }
 
-    private fun showFund(fundView: RecurrentTransactionFundView): Unit {
-        _title.value = fundView.fund.name
-        _description.value = fundView.fund.description
-        _fundFlow.value = fundView.fundSummaries.summary.fundFlow.flow.value
-        _inFlow.value = fundView.fundSummaries.summary.incomingFlow.flow.value
-        _outFlow.value = fundView.fundSummaries.summary.outgoingFlow.flow.value
+    private fun showFund(fundView: RecurrentTransactionFundView) {
+        _titleOfSelectedFund.value = Some(fundView.fund.name)
+        _descriptionOfSelectedFund.value = Some(fundView.fund.description)
     }
 
-    fun selectFund(fund: Fund): Unit {
-        _selectedFund.value = fund
+    fun selectFund(maybeFund: Option<Fund>) {
+        _selectedFund.value = maybeFund
     }
+
+    //User Input
+    private val _validTitleInput by lazy {
+        MutableLiveData<Option<String>>().apply { value = None }
+    }
+
+    val validTitleInput: LiveData<Option<String>> by lazy { _validTitleInput }
+
+    fun setTitleInput(maybeTitle: Option<String>) {
+        _validTitleInput.value = maybeTitle
+    }
+
+    private val _validDescriptionInput by lazy {
+        MutableLiveData<Option<String>>().apply { value = Some("") }
+    }
+
+    val validDescriptionInput: LiveData<Option<String>> by lazy { _validDescriptionInput }
+
+    fun setValidDescriptionInput(maybeDescription: Option<String>) {
+        _validDescriptionInput.value = maybeDescription
+    }
+
+
 }

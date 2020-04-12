@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
+import arrow.core.Option
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.monad.flatten
+import arrow.core.fix
 import arrow.core.getOrElse
 import arrow.core.toOption
 import com.google.android.material.textfield.TextInputLayout
@@ -34,91 +37,80 @@ class FundEditFragment : Fragment() {
 
         val titleView: TextInputLayout = root.findViewById(R.id.textFundTitle)
         val descriptionView: TextInputLayout = root.findViewById(R.id.textFundText)
-        val fundFlowView: TextView = root.findViewById(R.id.textFundFlowValue)
-        val inFlowView: TextView = root.findViewById(R.id.textInFlowValue)
-        val outFlowView: TextView = root.findViewById(R.id.textOutFlowValue)
 
-        fundEditViewModel.title.observe(this, Observer {
-            titleView.editText?.setText(it)
-        })
+        fundEditViewModel.titleOfSelectedFund.observe(
+            this,
+            Observer { maybeTitle: Option<String> ->
+                maybeTitle.map { title ->
+                    titleView.editText?.setText(title)
+                }
+            })
         titleView.editText?.doOnTextChanged { inputText, _, _, _ ->
-            FundEditValidation.setValidateFundTitleError(
+            FundEditValidation.handleFundTitleValidation(
                 inputText.toString(),
-                selectedFundOrDefault().name,
-                titleView
+                maybeSelectedFund().map { it.name },
+                titleView,
+                fundEditViewModel
             )
         }
 
-        fundEditViewModel.description.observe(this, Observer {
-            descriptionView.editText?.setText(it)
-        })
+        fundEditViewModel.descriptionOfSelectedFund.observe(
+            this,
+            Observer { maybeDescription: Option<String> ->
+                maybeDescription.map { description ->
+                    descriptionView.editText?.setText(description)
+                }
+            })
         descriptionView.editText?.doOnTextChanged { inputText, _, _, _ ->
-            FundEditValidation.setValidateFundDescriptionError(
+            FundEditValidation.handleFundDescriptionValidation(
                 inputText.toString(),
-                descriptionView
+                descriptionView,
+                fundEditViewModel
             )
         }
-
-        fundEditViewModel.fundFlow.observe(this, Observer {
-            fundFlowView.text = "$it"
-        })
-
-        fundEditViewModel.inFlow.observe(this, Observer {
-            inFlowView.text = "$it"
-        })
-
-        fundEditViewModel.outFlow.observe(this, Observer {
-            outFlowView.text = "$it"
-        })
 
         val safeArgs: FundEditFragmentArgs by navArgs()
         selectedFund = safeArgs.selectedFund
 
-        fundEditViewModel.selectFund(getFundOrDefault(selectedFund))
+        fundEditViewModel.selectFund(maybeSelectedFund())
 
         return root
     }
 
-    private fun selectedFundOrDefault(): Fund =
-        getFundOrDefault(selectedFund)
-
-    private fun getFundOrDefault(id: String): Fund =
-        DataManager.loadFundUsingRefId(id).getOrElse { Fund.empty() }
+    private fun maybeSelectedFund(): Option<Fund> =
+        DataManager.loadFundUsingRefId(selectedFund)
 
     override fun onPause() {
         super.onPause()
-        saveFund(selectedFundOrDefault())
+        saveFund(maybeSelectedFund())
     }
 
-    private fun saveFund(fund: Fund) {
-        val root = view.toOption()
-        root.map {
-            val titleView: TextInputLayout = it.findViewById(R.id.textFundTitle)
-            val descriptionView: TextInputLayout = it.findViewById(R.id.textFundText)
-            val title = titleView.editText?.text.toString()
-            val description = descriptionView.editText?.text.toString()
-            StringRules.validateNotEmpty(title).toOption().map { nonEmptyTitle: String ->
-                FundEditValidation.validateFundTitle(nonEmptyTitle, selectedFundOrDefault().name)
-                    .toOption()
-                    .map { validFundTitle: String ->
-                        FundEditValidation.validateFundDescription(description).toOption()
-                            .map { validFundDescription: String ->
-                                DataManager.saveFund(
-                                    fund.copy(
-                                        name = validFundTitle,
-                                        description = validFundDescription
-                                    )
-                                )
-                                val fundListViewModel =
-                                    activity?.run {
-                                        ViewModelProvider(this).get(FundListViewModel::class.java)
-                                    } ?: throw Exception("Invalid Activity")
-                                fundListViewModel.updateFundList()
-                            }
-                    }
+    private fun saveFund(maybeSelectedFund: Option<Fund>) {
+        val maybeValidTitle: Option<String> =
+            fundEditViewModel.validTitleInput.value.toOption().flatten()
+        val maybeValidDescription: Option<String> =
+            fundEditViewModel.validDescriptionInput.value.toOption().flatten()
+
+        Option.applicative().map(
+            maybeValidTitle,
+            maybeValidDescription
+        ) { (validFundTitle, validFundDescription) ->
+            maybeSelectedFund.map { selectedFund ->
+                selectedFund.copy(
+                    name = validFundTitle,
+                    description = validFundDescription
+                )
+            }.getOrElse {
+                Fund(validFundTitle, validFundDescription)
             }
-        }
-
-
+        }.fix()
+            .map { fundToSave ->
+                DataManager.saveFund(fundToSave)
+                fundListViewModel().updateFundList()
+            }
     }
+
+    fun fundListViewModel(): FundListViewModel = activity?.run {
+        ViewModelProvider(this).get(FundListViewModel::class.java)
+    } ?: throw Exception("Invalid Activity")
 }
