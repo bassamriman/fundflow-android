@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import arrow.core.getOrElse
 import arrow.core.toOption
+import com.google.android.material.textfield.TextInputLayout
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
 import com.rimanware.fundflow_android.ui.fund_list.FundListViewModel
@@ -30,19 +32,32 @@ class FundEditFragment : Fragment() {
 
         val root = inflater.inflate(R.layout.fragment_fund_edit, container, false)
 
-        val titleView: TextView = root.findViewById(R.id.textFundTitle)
-        val descriptionView: TextView = root.findViewById(R.id.textFundText)
+        val titleView: TextInputLayout = root.findViewById(R.id.textFundTitle)
+        val descriptionView: TextInputLayout = root.findViewById(R.id.textFundText)
         val fundFlowView: TextView = root.findViewById(R.id.textFundFlowValue)
         val inFlowView: TextView = root.findViewById(R.id.textInFlowValue)
         val outFlowView: TextView = root.findViewById(R.id.textOutFlowValue)
 
         fundEditViewModel.title.observe(this, Observer {
-            titleView.text = it
+            titleView.editText?.setText(it)
         })
+        titleView.editText?.doOnTextChanged { inputText, _, _, _ ->
+            FundEditValidation.setValidateFundTitleError(
+                inputText.toString(),
+                selectedFundOrDefault().name,
+                titleView
+            )
+        }
 
         fundEditViewModel.description.observe(this, Observer {
-            descriptionView.text = it
+            descriptionView.editText?.setText(it)
         })
+        descriptionView.editText?.doOnTextChanged { inputText, _, _, _ ->
+            FundEditValidation.setValidateFundDescriptionError(
+                inputText.toString(),
+                descriptionView
+            )
+        }
 
         fundEditViewModel.fundFlow.observe(this, Observer {
             fundFlowView.text = "$it"
@@ -78,21 +93,29 @@ class FundEditFragment : Fragment() {
     private fun saveFund(fund: Fund) {
         val root = view.toOption()
         root.map {
-            val titleView: TextView = it.findViewById(R.id.textFundTitle)
-            val descriptionView: TextView = it.findViewById(R.id.textFundText)
-            if (titleView.text.toString().isNotEmpty()) {
-                DataManager.saveFund(
-                    fund.copy(
-                        name = titleView.text.toString(),
-                        description = descriptionView.text.toString()
-                    )
-                )
-                val fundListViewModel =
-                    activity?.run {
-                        ViewModelProvider(this).get(FundListViewModel::class.java)
-                    } ?: throw Exception("Invalid Activity")
-
-                fundListViewModel.updateFundList()
+            val titleView: TextInputLayout = it.findViewById(R.id.textFundTitle)
+            val descriptionView: TextInputLayout = it.findViewById(R.id.textFundText)
+            val title = titleView.editText?.text.toString()
+            val description = descriptionView.editText?.text.toString()
+            StringRules.validateNotEmpty(title).toOption().map { nonEmptyTitle: String ->
+                FundEditValidation.validateFundTitle(nonEmptyTitle, selectedFundOrDefault().name)
+                    .toOption()
+                    .map { validFundTitle: String ->
+                        FundEditValidation.validateFundDescription(description).toOption()
+                            .map { validFundDescription: String ->
+                                DataManager.saveFund(
+                                    fund.copy(
+                                        name = validFundTitle,
+                                        description = validFundDescription
+                                    )
+                                )
+                                val fundListViewModel =
+                                    activity?.run {
+                                        ViewModelProvider(this).get(FundListViewModel::class.java)
+                                    } ?: throw Exception("Invalid Activity")
+                                fundListViewModel.updateFundList()
+                            }
+                    }
             }
         }
 

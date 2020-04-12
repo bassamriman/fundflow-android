@@ -45,6 +45,7 @@ dependencies {
     implementation "io.arrow-kt:arrow-mtl-data:$arrow_version"
     implementation "io.arrow-kt:arrow-core-data:$arrow_version"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.material:material:1.1.0'
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'

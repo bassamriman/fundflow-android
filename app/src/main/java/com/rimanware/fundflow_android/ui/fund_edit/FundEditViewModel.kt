@@ -2,7 +2,6 @@ package com.rimanware.fundflow_android.ui.fund_edit
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.rimanware.fundflow_android.DataManager
 import fundflow.Fund
@@ -48,7 +47,7 @@ class FundEditViewModel : ViewModel() {
     }
 
     private fun showFund(fundView: RecurrentTransactionFundView): Unit {
-         _title.value = fundView.fund.name
+        _title.value = fundView.fund.name
         _description.value = fundView.fund.description
         _fundFlow.value = fundView.fundSummaries.summary.fundFlow.flow.value
         _inFlow.value = fundView.fundSummaries.summary.incomingFlow.flow.value
