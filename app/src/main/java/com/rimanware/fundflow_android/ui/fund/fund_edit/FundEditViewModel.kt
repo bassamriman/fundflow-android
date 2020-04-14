@@ -1,4 +1,4 @@
-package com.rimanware.fundflow_android.ui.fund_edit
+package com.rimanware.fundflow_android.ui.fund.fund_edit
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,7 +16,7 @@ class FundEditViewModel : ViewModel() {
     private val _selectedFund by lazy {
         MutableLiveData<Option<Fund>>().apply { value = None }
     }
-    private val selectedFund: LiveData<Option<Fund>> by lazy { _selectedFund }
+    val selectedFund: LiveData<Option<Fund>> by lazy { _selectedFund }
 
     private val _titleOfSelectedFund by lazy {
         MutableLiveData<Option<String>>().apply { value = None }

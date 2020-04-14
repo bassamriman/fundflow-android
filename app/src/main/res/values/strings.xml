@@ -11,6 +11,7 @@
 
     <string name="menu_fund_list">Funds</string>
     <string name="menu_fund_edit">Fund Edit</string>
+    <string name="menu_fund_view">Fund View</string>
     <string name="menu_recurrent_transaction_list">Transactions</string>
     <string name="menu_recurrent_transaction_edit">Transaction Edit</string>
 </resources>

@@ -7,17 +7,20 @@
 
     <fragment
         android:id="@+id/nav_fund_list"
-        android:name="com.rimanware.fundflow_android.ui.fund_list.FundListFragment"
+        android:name="com.rimanware.fundflow_android.ui.fund.fund_list.FundListFragment"
         android:label="@string/menu_fund_list"
         tools:layout="@layout/fragment_fund_list">
         <action
             android:id="@+id/action_nav_fund_list_to_nav_fund_edit"
             app:destination="@id/nav_fund_edit" />
+        <action
+            android:id="@+id/action_nav_fund_list_to_nav_fund_view"
+            app:destination="@id/nav_fund_view" />
     </fragment>
 
     <fragment
         android:id="@+id/nav_fund_edit"
-        android:name="com.rimanware.fundflow_android.ui.fund_edit.FundEditFragment"
+        android:name="com.rimanware.fundflow_android.ui.fund.fund_edit.FundEditFragment"
         android:label="@string/menu_fund_edit"
         tools:layout="@layout/fragment_fund_edit">
         <argument
@@ -26,12 +29,12 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_recurrent_transaction_edit"
-        android:name="com.rimanware.fundflow_android.ui.recurrent_transaction_edit.RecurrentTransactionEditFragment"
+        android:id="@+id/nav_fund_view"
+        android:name="com.rimanware.fundflow_android.ui.fund.fund_view.FundViewFragment"
         android:label="@string/menu_fund_edit"
-        tools:layout="@layout/fragment_recurrent_transaction_edit">
+        tools:layout="@layout/fragment_fund_view">
         <argument
-            android:name="selectedRecurrentTransaction"
+            android:name="selectedFund"
             app:argType="string" />
     </fragment>
 
@@ -43,6 +46,16 @@
         <action
             android:id="@+id/action_nav_recurrent_transaction_list_to_nav_recurrent_transaction_edit"
             app:destination="@+id/nav_recurrent_transaction_edit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_recurrent_transaction_edit"
+        android:name="com.rimanware.fundflow_android.ui.recurrent_transaction_edit.RecurrentTransactionEditFragment"
+        android:label="@string/menu_fund_edit"
+        tools:layout="@layout/fragment_recurrent_transaction_edit">
+        <argument
+            android:name="selectedRecurrentTransaction"
+            app:argType="string" />
     </fragment>
 
 

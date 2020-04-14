@@ -1,4 +1,4 @@
-package com.rimanware.fundflow_android.ui.fund_edit
+package com.rimanware.fundflow_android.ui.fund.fund_edit
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,13 +18,12 @@ import arrow.core.toOption
 import com.google.android.material.textfield.TextInputLayout
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
-import com.rimanware.fundflow_android.ui.fund_list.FundListViewModel
+import com.rimanware.fundflow_android.ui.fund.fund_list.FundListViewModel
 import fundflow.Fund
 
 class FundEditFragment : Fragment() {
 
     private lateinit var fundEditViewModel: FundEditViewModel
-    private lateinit var selectedFund: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,14 +44,6 @@ class FundEditFragment : Fragment() {
                     titleView.editText?.setText(title)
                 }
             })
-        titleView.editText?.doOnTextChanged { inputText, _, _, _ ->
-            FundEditValidation.handleFundTitleValidation(
-                inputText.toString(),
-                maybeSelectedFund().map { it.name },
-                titleView,
-                fundEditViewModel
-            )
-        }
 
         fundEditViewModel.descriptionOfSelectedFund.observe(
             this,
@@ -61,6 +52,20 @@ class FundEditFragment : Fragment() {
                     descriptionView.editText?.setText(description)
                 }
             })
+
+
+        val safeArgs: FundEditFragmentArgs by navArgs()
+        val selectedFundRef = safeArgs.selectedFund
+        val selectedFund = maybeSelectedFund(selectedFundRef)
+
+        titleView.editText?.doOnTextChanged { inputText, _, _, _ ->
+            FundEditValidation.handleFundTitleValidation(
+                inputText.toString(),
+                selectedFund.map { it.name },
+                titleView,
+                fundEditViewModel
+            )
+        }
         descriptionView.editText?.doOnTextChanged { inputText, _, _, _ ->
             FundEditValidation.handleFundDescriptionValidation(
                 inputText.toString(),
@@ -69,20 +74,15 @@ class FundEditFragment : Fragment() {
             )
         }
 
-        val safeArgs: FundEditFragmentArgs by navArgs()
-        selectedFund = safeArgs.selectedFund
-
-        fundEditViewModel.selectFund(maybeSelectedFund())
-
         return root
     }
 
-    private fun maybeSelectedFund(): Option<Fund> =
+    private fun maybeSelectedFund(selectedFund: String): Option<Fund> =
         DataManager.loadFundUsingRefId(selectedFund)
 
     override fun onPause() {
         super.onPause()
-        saveFund(maybeSelectedFund())
+        saveFund(fundEditViewModel.selectedFund.value.toOption().flatten())
     }
 
     private fun saveFund(maybeSelectedFund: Option<Fund>) {

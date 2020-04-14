@@ -1,4 +1,4 @@
-package com.rimanware.fundflow_android.ui.fund_list
+package com.rimanware.fundflow_android.ui.fund.fund_list
 
 import android.os.Bundle
 import android.view.LayoutInflater

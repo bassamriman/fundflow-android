@@ -1,4 +1,4 @@
-package com.rimanware.fundflow_android.ui.fund_list
+package com.rimanware.fundflow_android.ui.fund.fund_list
 
 import android.view.LayoutInflater
 import android.view.View
@@ -46,7 +46,7 @@ class FundListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     init {
         itemView.setOnClickListener {
             val action =
-                FundListFragmentDirections.actionNavFundListToNavFundEdit(DataManager.loadAllFunds()[adapterPosition].reference.id)
+                FundListFragmentDirections.actionNavFundListToNavFundView(DataManager.loadAllFunds()[adapterPosition].reference.id)
             itemView.findNavController().navigate(action)
         }
     }
