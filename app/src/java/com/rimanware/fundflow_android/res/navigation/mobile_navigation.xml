@@ -40,7 +40,7 @@
 
     <fragment
         android:id="@+id/nav_recurrent_transaction_list"
-        android:name="com.rimanware.fundflow_android.ui.recurrent_transaction_list.RecurrentTransactionListFragment"
+        android:name="com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transaction_list.RecurrentTransactionListFragment"
         android:label="@string/menu_recurrent_transaction_list"
         tools:layout="@layout/fragment_recurrent_transaction_list">
         <action
@@ -50,7 +50,7 @@
 
     <fragment
         android:id="@+id/nav_recurrent_transaction_edit"
-        android:name="com.rimanware.fundflow_android.ui.recurrent_transaction_edit.RecurrentTransactionEditFragment"
+        android:name="com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transaction_edit.RecurrentTransactionEditFragment"
         android:label="@string/menu_fund_edit"
         tools:layout="@layout/fragment_recurrent_transaction_edit">
         <argument

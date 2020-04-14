@@ -1,4 +1,4 @@
-package com.rimanware.fundflow_android.ui.recurrent_transaction_edit
+package com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transaction_edit
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,7 +17,7 @@ import arrow.core.toOption
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
 import com.rimanware.fundflow_android.ui.fund.fund_list.FundListViewModel
-import com.rimanware.fundflow_android.ui.recurrent_transaction_list.RecurrentTransactionListViewModel
+import com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transaction_list.RecurrentTransactionListViewModel
 import common.Daily
 import common.DateTimeInterval
 import fundflow.DailyFlow

@@ -1,4 +1,4 @@
-package com.rimanware.fundflow_android.ui.recurrent_transaction_edit
+package com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transaction_edit
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

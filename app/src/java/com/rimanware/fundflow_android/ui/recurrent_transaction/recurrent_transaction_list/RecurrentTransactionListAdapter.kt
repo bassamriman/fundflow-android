@@ -1,4 +1,4 @@
-package com.rimanware.fundflow_android.ui.recurrent_transaction_list
+package com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transaction_list
 
 import android.view.LayoutInflater
 import android.view.View
