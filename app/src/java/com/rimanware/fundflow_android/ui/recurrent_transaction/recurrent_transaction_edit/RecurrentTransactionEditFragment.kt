@@ -16,6 +16,7 @@ import arrow.core.toOption
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.databinding.FragmentRecurrentTransactionEditBinding
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
+import com.rimanware.fundflow_android.ui.common.viewModels
 import com.rimanware.fundflow_android.ui.fund.fund_list.FundListViewModel
 import com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transaction_list.RecurrentTransactionListViewModel
 import common.Daily
@@ -35,7 +36,7 @@ import java.time.format.DateTimeFormatter
 class RecurrentTransactionEditFragment :
     ViewBindingFragment<FragmentRecurrentTransactionEditBinding>() {
 
-    private lateinit var recurrentTransactionEditViewModel: RecurrentTransactionEditViewModel
+    private val recurrentTransactionEditViewModel: RecurrentTransactionEditViewModel by viewModels()
     private lateinit var selectedRecurrentTransaction: String
 
     private val dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy")
@@ -46,8 +47,6 @@ class RecurrentTransactionEditFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        recurrentTransactionEditViewModel =
-            ViewModelProvider(this).get(RecurrentTransactionEditViewModel::class.java)
 
         bindView(
             FragmentRecurrentTransactionEditBinding.inflate(

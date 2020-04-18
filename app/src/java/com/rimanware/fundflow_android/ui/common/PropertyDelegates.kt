@@ -6,7 +6,7 @@ import arrow.core.Some
 import arrow.core.getOrElse
 import kotlin.reflect.KProperty
 
-class Delegate {
+class Delegat2e {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
         return "$thisRef, thank you for delegating '${property.name}' to me!"
     }

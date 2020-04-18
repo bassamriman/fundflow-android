@@ -5,17 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rimanware.fundflow_android.databinding.FragmentFundListBinding
+import com.rimanware.fundflow_android.ui.common.ClassArg
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
+import com.rimanware.fundflow_android.ui.common.viewModels
 
 
 class FundListFragment : ViewBindingFragment<FragmentFundListBinding>() {
 
-    private lateinit var fundListViewModel: FundListViewModel
+    private val fundListViewModel: FundListViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,11 +34,6 @@ class FundListFragment : ViewBindingFragment<FragmentFundListBinding>() {
 
         val root = viewBinding.root
 
-        //Get the fundListViewModel
-        fundListViewModel = activity?.run {
-            ViewModelProvider(this).get(FundListViewModel::class.java)
-        } ?: throw Exception("Invalid Activity")
-
         //Setup recycler view
         val recyclerView = viewBinding.listItems
 
@@ -54,7 +50,10 @@ class FundListFragment : ViewBindingFragment<FragmentFundListBinding>() {
 
         fab.setOnClickListener {
             val action =
-                FundListFragmentDirections.actionNavFundListToNavFundEdit("")
+                FundListFragmentDirections.actionNavFundListToNavFundEdit(
+                    "",
+                    ClassArg(FundListViewModel::class.java)
+                )
             it.findNavController().navigate(action)
         }
 

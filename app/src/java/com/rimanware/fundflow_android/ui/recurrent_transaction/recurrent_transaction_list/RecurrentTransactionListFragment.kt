@@ -4,18 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rimanware.fundflow_android.databinding.FragmentRecurrentTransactionListBinding
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
+import com.rimanware.fundflow_android.ui.common.viewModels
 
 
 class RecurrentTransactionListFragment :
     ViewBindingFragment<FragmentRecurrentTransactionListBinding>() {
 
-    private lateinit var recurrentTransactionListViewModel: RecurrentTransactionListViewModel
+    private val recurrentTransactionListViewModel: RecurrentTransactionListViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,11 +33,6 @@ class RecurrentTransactionListFragment :
 
         //Inflate View
         val rootView: View = viewBinding.root
-
-        //Get the recurrentTransactionListViewModel
-        recurrentTransactionListViewModel = activity?.run {
-            ViewModelProvider(this).get(RecurrentTransactionListViewModel::class.java)
-        } ?: throw Exception("Invalid Activity")
 
         //Setup recycler view
         val recyclerView = viewBinding.recurrentTransactionListItems

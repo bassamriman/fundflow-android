@@ -7,20 +7,22 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.util.Pair
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import arrow.core.Option
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.databinding.FragmentFundFlowCardBinding
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
-import fundflow.Fund
+import com.rimanware.fundflow_android.ui.common.registerViewModelContract
+import com.rimanware.fundflow_android.ui.common.viewModelContracts
+import com.rimanware.fundflow_android.ui.common.viewModels
+import com.rimanware.fundflow_android.ui.fund.fund_view.SelectedFundViewModelContract
 import java.math.BigDecimal
 import java.util.*
 
 class FundFlowCardViewFragment : ViewBindingFragment<FragmentFundFlowCardBinding>() {
 
-    private lateinit var fundCardViewViewModel: FundFlowCardViewViewModel
+    private val fundCardViewViewModel: FundFlowCardViewViewModel by viewModels()
+    private val viewModelContract: SelectedFundViewModelContract by viewModelContracts()
 
     private var today: Long = 0
     private var nextMonth: Long = 0
@@ -61,7 +63,6 @@ class FundFlowCardViewFragment : ViewBindingFragment<FragmentFundFlowCardBinding
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        fundCardViewViewModel = ViewModelProvider(this).get(FundFlowCardViewViewModel::class.java)
 
         bindView(FragmentFundFlowCardBinding.inflate(inflater, container, false))
 
@@ -107,14 +108,19 @@ class FundFlowCardViewFragment : ViewBindingFragment<FragmentFundFlowCardBinding
             }
         })
 
-/*        val safeArgs: FundViewFragmentArgs by navArgs()
-        val selectedFund = safeArgs.selectedFund
-
-        fundViewViewModel.selectFund(maybeSelectedFund(selectedFund))*/
+        viewModelContract.selectedFund.observe(this, Observer {
+            fundCardViewViewModel.selectFund(it)
+        })
 
         return root
     }
 
-    private fun maybeSelectedFund(selectedFund: String): Option<Fund> =
-        DataManager.loadFundUsingRefId(selectedFund)
+    companion object {
+        fun <T : SelectedFundViewModelContract> newInstance(contract: Class<T>): FundFlowCardViewFragment {
+            return FundFlowCardViewFragment().apply {
+                val bundle = registerViewModelContract(contract)
+                arguments = bundle
+            }
+        }
+    }
 }

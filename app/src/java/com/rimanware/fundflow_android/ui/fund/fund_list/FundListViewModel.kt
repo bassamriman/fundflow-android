@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.rimanware.fundflow_android.DataManager
 import fundflow.Fund
 
-class FundListViewModel : ViewModel() {
+class FundListViewModel : ViewModel(), UpdateFundListViewModelContract {
 
     private val _funds by lazy {
         MutableLiveData<List<Fund>>().apply {
@@ -16,9 +16,13 @@ class FundListViewModel : ViewModel() {
 
     val funds: LiveData<List<Fund>> = _funds
 
-    fun updateFundList(): Unit {
+    override fun updateFundList(): Unit {
         _funds.apply {
             value = DataManager.loadAllFunds()
         }
     }
+}
+
+interface UpdateFundListViewModelContract {
+    fun updateFundList(): Unit
 }

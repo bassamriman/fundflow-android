@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import arrow.core.Option
@@ -18,19 +19,21 @@ import com.google.android.material.textfield.TextInputLayout
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.databinding.FragmentFundEditBinding
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
-import com.rimanware.fundflow_android.ui.fund.fund_list.FundListViewModel
+import com.rimanware.fundflow_android.ui.common.viewModelContracts
+import com.rimanware.fundflow_android.ui.common.viewModels
+import com.rimanware.fundflow_android.ui.fund.fund_list.UpdateFundListViewModelContract
 import fundflow.Fund
 
 class FundEditFragment : ViewBindingFragment<FragmentFundEditBinding>() {
 
-    private lateinit var fundEditViewModel: FundEditViewModel
+    private val fundEditViewModel: FundEditViewModel by viewModels()
+    private val modelViewContract: UpdateFundListViewModelContract by viewModelContracts()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        fundEditViewModel = ViewModelProvider(this).get(FundEditViewModel::class.java)
 
         val root = bindView(FragmentFundEditBinding.inflate(inflater, container, false)).root
 
@@ -106,11 +109,7 @@ class FundEditFragment : ViewBindingFragment<FragmentFundEditBinding>() {
         }.fix()
             .map { fundToSave ->
                 DataManager.saveFund(fundToSave)
-                fundListViewModel().updateFundList()
+                modelViewContract.updateFundList()
             }
     }
-
-    fun fundListViewModel(): FundListViewModel = activity?.run {
-        ViewModelProvider(this).get(FundListViewModel::class.java)
-    } ?: throw Exception("Invalid Activity")
 }

@@ -26,6 +26,9 @@
         <argument
             android:name="selectedFund"
             app:argType="string" />
+        <argument
+            android:name="modelViewKeyContract"
+            app:argType="com.rimanware.fundflow_android.ui.common.ClassArg" />
     </fragment>
 
     <fragment

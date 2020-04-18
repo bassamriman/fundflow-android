@@ -63,7 +63,7 @@ android {
 }
 
 def arrow_version = "0.10.4"
-def nav_version = "2.2.1"
+def nav_version = "2.2.2"
 
 dependencies {
     implementation "io.arrow-kt:arrow-fx:$arrow_version"

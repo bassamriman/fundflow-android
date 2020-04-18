@@ -6,29 +6,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import arrow.core.Option
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
 import com.rimanware.fundflow_android.databinding.FragmentFundViewBinding
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
+import com.rimanware.fundflow_android.ui.common.viewModels
 import com.rimanware.fundflow_android.ui.fund.fund_flow_card_view.FundFlowCardViewFragment
 import fundflow.Fund
 
 
 class FundViewFragment : ViewBindingFragment<FragmentFundViewBinding>() {
 
-    private lateinit var fundViewViewModel: FundViewViewModel
+    private val fundViewViewModel: FundViewViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        fundViewViewModel = ViewModelProvider(this).get(FundViewViewModel::class.java)
 
         bindView(
             FragmentFundViewBinding.inflate(
@@ -64,9 +62,10 @@ class FundViewFragment : ViewBindingFragment<FragmentFundViewBinding>() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val childFragment: Fragment = FundFlowCardViewFragment()
-        val transaction: FragmentTransaction = childFragmentManager.beginTransaction()
-        transaction.replace(R.id.fundFlowCardFragment, childFragment).commit()
+        val fundFlowCardViewFragment: Fragment =
+            FundFlowCardViewFragment.newInstance(FundViewViewModel::class.java)
+        childFragmentManager.beginTransaction()
+            .replace(R.id.fundFlowCardFragment, fundFlowCardViewFragment).commit()
     }
 
     private fun maybeSelectedFund(selectedFund: String): Option<Fund> =

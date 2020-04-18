@@ -8,12 +8,12 @@ import arrow.core.Option
 import arrow.core.Some
 import fundflow.Fund
 
-class FundViewViewModel : ViewModel() {
+class FundViewViewModel : ViewModel(), SelectedFundViewModelContract {
 
     private val _selectedFund by lazy {
         MutableLiveData<Option<Fund>>().apply { value = None }
     }
-    val selectedFund: LiveData<Option<Fund>> by lazy { _selectedFund }
+    override val selectedFund: LiveData<Option<Fund>> by lazy { _selectedFund }
 
     fun selectFund(maybeFund: Option<Fund>) {
         _selectedFund.value = maybeFund
@@ -41,4 +41,8 @@ class FundViewViewModel : ViewModel() {
         _title.value = Some(fund.name)
         _description.value = Some(fund.description)
     }
+}
+
+interface SelectedFundViewModelContract {
+    val selectedFund: LiveData<Option<Fund>>
 }
