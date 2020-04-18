@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
@@ -17,11 +16,12 @@ import arrow.core.getOrElse
 import arrow.core.toOption
 import com.google.android.material.textfield.TextInputLayout
 import com.rimanware.fundflow_android.DataManager
-import com.rimanware.fundflow_android.R
+import com.rimanware.fundflow_android.databinding.FragmentFundEditBinding
+import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
 import com.rimanware.fundflow_android.ui.fund.fund_list.FundListViewModel
 import fundflow.Fund
 
-class FundEditFragment : Fragment() {
+class FundEditFragment : ViewBindingFragment<FragmentFundEditBinding>() {
 
     private lateinit var fundEditViewModel: FundEditViewModel
 
@@ -32,10 +32,10 @@ class FundEditFragment : Fragment() {
     ): View? {
         fundEditViewModel = ViewModelProvider(this).get(FundEditViewModel::class.java)
 
-        val root = inflater.inflate(R.layout.fragment_fund_edit, container, false)
+        val root = bindView(FragmentFundEditBinding.inflate(inflater, container, false)).root
 
-        val titleView: TextInputLayout = root.findViewById(R.id.textFundTitle)
-        val descriptionView: TextInputLayout = root.findViewById(R.id.textFundText)
+        val titleView: TextInputLayout = viewBinding.textFundTitle
+        val descriptionView: TextInputLayout = viewBinding.textFundText
 
         fundEditViewModel.titleOfSelectedFund.observe(
             this,

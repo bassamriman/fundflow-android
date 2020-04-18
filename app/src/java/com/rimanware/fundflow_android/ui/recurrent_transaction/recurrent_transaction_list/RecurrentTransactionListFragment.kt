@@ -4,17 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.rimanware.fundflow_android.R
+import com.rimanware.fundflow_android.databinding.FragmentRecurrentTransactionListBinding
+import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
 
 
-class RecurrentTransactionListFragment : Fragment() {
+class RecurrentTransactionListFragment :
+    ViewBindingFragment<FragmentRecurrentTransactionListBinding>() {
 
     private lateinit var recurrentTransactionListViewModel: RecurrentTransactionListViewModel
 
@@ -24,9 +23,16 @@ class RecurrentTransactionListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        bindView(
+            FragmentRecurrentTransactionListBinding.inflate(
+                inflater,
+                container,
+                false
+            )
+        )
+
         //Inflate View
-        val rootView: View =
-            inflater.inflate(R.layout.fragment_recurrent_transaction_list, container, false)
+        val rootView: View = viewBinding.root
 
         //Get the recurrentTransactionListViewModel
         recurrentTransactionListViewModel = activity?.run {
@@ -34,18 +40,18 @@ class RecurrentTransactionListFragment : Fragment() {
         } ?: throw Exception("Invalid Activity")
 
         //Setup recycler view
-        val recyclerView = rootView.findViewById<RecyclerView>(R.id.recurrentTransactionListItems)
+        val recyclerView = viewBinding.recurrentTransactionListItems
 
         val recurrentTransactionListAdapter = RecurrentTransactionListAdapter()
 
-        recurrentTransactionListViewModel.recurrentTransactions.observeForever(Observer {
+        recurrentTransactionListViewModel.recurrentTransactions.observeForever {
             recurrentTransactionListAdapter.submitList(it)
-        })
+        }
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = recurrentTransactionListAdapter
 
-        val fab: FloatingActionButton = rootView.findViewById(R.id.recurrentTransactionFab)
+        val fab: FloatingActionButton = viewBinding.recurrentTransactionFab
 
         fab.setOnClickListener {
             val action =

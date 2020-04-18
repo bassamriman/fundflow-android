@@ -6,16 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import arrow.core.Option
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
+import com.rimanware.fundflow_android.databinding.FragmentFundViewBinding
+import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
+import com.rimanware.fundflow_android.ui.fund.fund_flow_card_view.FundFlowCardViewFragment
 import fundflow.Fund
-import java.math.BigDecimal
 
-class FundViewFragment : Fragment() {
+
+class FundViewFragment : ViewBindingFragment<FragmentFundViewBinding>() {
 
     private lateinit var fundViewViewModel: FundViewViewModel
 
@@ -26,10 +30,18 @@ class FundViewFragment : Fragment() {
     ): View? {
         fundViewViewModel = ViewModelProvider(this).get(FundViewViewModel::class.java)
 
-        val root = inflater.inflate(R.layout.fragment_fund_view, container, false)
+        bindView(
+            FragmentFundViewBinding.inflate(
+                inflater,
+                container,
+                false
+            )
+        )
 
-        val titleView: TextView = root.findViewById(R.id.textFundTitle)
-        val descriptionView: TextView = root.findViewById(R.id.textFundDescriptionValue)
+        val root = viewBinding.root
+
+        val titleView: TextView = viewBinding.textFundTitle
+        val descriptionView: TextView = viewBinding.textFundDescriptionValue
 
         fundViewViewModel.title.observe(this, Observer { maybeTitle: Option<String> ->
             maybeTitle.map {
@@ -42,30 +54,6 @@ class FundViewFragment : Fragment() {
                 descriptionView.text = it
             }
         })
-        val inFlowView: TextView = root.findViewById(R.id.textInFlowValue)
-        val fundFlowView: TextView = root.findViewById(R.id.textFundFlowValue)
-        val outFlowView: TextView = root.findViewById(R.id.textOutFlowValue)
-
-        fundViewViewModel.inFlow.observe(this, Observer { maybeInFlow: Option<BigDecimal> ->
-            maybeInFlow.map {
-                val test = "$${it.setScale(2)}/Day"
-                inFlowView.text = test
-            }
-        })
-
-        fundViewViewModel.fundFlow.observe(this, Observer { maybeFundFlow: Option<BigDecimal> ->
-            maybeFundFlow.map {
-                val test = "$${it.setScale(2)}/Day"
-                fundFlowView.text = test
-            }
-        })
-
-        fundViewViewModel.outFlow.observe(this, Observer { maybeOutFlow: Option<BigDecimal> ->
-            maybeOutFlow.map {
-                val test = "$${it.setScale(2)}/Day"
-                outFlowView.text = test
-            }
-        })
 
         val safeArgs: FundViewFragmentArgs by navArgs()
         val selectedFund = safeArgs.selectedFund
@@ -73,6 +61,12 @@ class FundViewFragment : Fragment() {
         fundViewViewModel.selectFund(maybeSelectedFund(selectedFund))
 
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val childFragment: Fragment = FundFlowCardViewFragment()
+        val transaction: FragmentTransaction = childFragmentManager.beginTransaction()
+        transaction.replace(R.id.fundFlowCardFragment, childFragment).commit()
     }
 
     private fun maybeSelectedFund(selectedFund: String): Option<Fund> =

@@ -4,17 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.rimanware.fundflow_android.R
+import com.rimanware.fundflow_android.databinding.FragmentFundListBinding
+import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
 
 
-class FundListFragment : Fragment() {
+class FundListFragment : ViewBindingFragment<FragmentFundListBinding>() {
 
     private lateinit var fundListViewModel: FundListViewModel
 
@@ -24,8 +23,15 @@ class FundListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        //Inflate View
-        val rootView: View = inflater.inflate(R.layout.fragment_fund_list, container, false)
+        bindView(
+            FragmentFundListBinding.inflate(
+                inflater,
+                container,
+                false
+            )
+        )
+
+        val root = viewBinding.root
 
         //Get the fundListViewModel
         fundListViewModel = activity?.run {
@@ -33,7 +39,7 @@ class FundListFragment : Fragment() {
         } ?: throw Exception("Invalid Activity")
 
         //Setup recycler view
-        val recyclerView = rootView.findViewById<RecyclerView>(R.id.listItems)
+        val recyclerView = viewBinding.listItems
 
         val fundListAdapter = FundListAdapter()
 
@@ -44,7 +50,7 @@ class FundListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = fundListAdapter
 
-        val fab: FloatingActionButton = rootView.findViewById(R.id.fab)
+        val fab: FloatingActionButton = viewBinding.fab
 
         fab.setOnClickListener {
             val action =
@@ -52,7 +58,7 @@ class FundListFragment : Fragment() {
             it.findNavController().navigate(action)
         }
 
-        return rootView
+        return root
     }
 
 

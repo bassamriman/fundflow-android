@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
@@ -15,7 +14,8 @@ import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.core.toOption
 import com.rimanware.fundflow_android.DataManager
-import com.rimanware.fundflow_android.R
+import com.rimanware.fundflow_android.databinding.FragmentRecurrentTransactionEditBinding
+import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
 import com.rimanware.fundflow_android.ui.fund.fund_list.FundListViewModel
 import com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transaction_list.RecurrentTransactionListViewModel
 import common.Daily
@@ -32,7 +32,8 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-class RecurrentTransactionEditFragment : Fragment() {
+class RecurrentTransactionEditFragment :
+    ViewBindingFragment<FragmentRecurrentTransactionEditBinding>() {
 
     private lateinit var recurrentTransactionEditViewModel: RecurrentTransactionEditViewModel
     private lateinit var selectedRecurrentTransaction: String
@@ -48,7 +49,15 @@ class RecurrentTransactionEditFragment : Fragment() {
         recurrentTransactionEditViewModel =
             ViewModelProvider(this).get(RecurrentTransactionEditViewModel::class.java)
 
-        val root = inflater.inflate(R.layout.fragment_recurrent_transaction_edit, container, false)
+        bindView(
+            FragmentRecurrentTransactionEditBinding.inflate(
+                inflater,
+                container,
+                false
+            )
+        )
+
+        val root = viewBinding.root
 
         //Get the fundListViewModel
         val fundListViewModel = activity?.run {
@@ -60,13 +69,13 @@ class RecurrentTransactionEditFragment : Fragment() {
             recurrentTransactionEditViewModel.setFundList(it)
         })
 
-        val spinnerFromFund = root.findViewById<Spinner>(R.id.spinnerFromFundSelection)
-        val spinnerToFund = root.findViewById<Spinner>(R.id.spinnerToFundSelection)
-        val fundFlow: TextView = root.findViewById(R.id.textFundFlowValue)
-        val fromDateView: TextView = root.findViewById(R.id.textFromDate)
-        val toDateView: TextView = root.findViewById(R.id.textToDate)
-        val fromTimeView: TextView = root.findViewById(R.id.textFromTime)
-        val toTimeView: TextView = root.findViewById(R.id.textToTime)
+        val spinnerFromFund = viewBinding.spinnerFromFundSelection
+        val spinnerToFund = viewBinding.spinnerToFundSelection
+        val fundFlow: TextView = viewBinding.textFundFlowValue
+        val fromDateView: TextView = viewBinding.textFromDate
+        val toDateView: TextView = viewBinding.textToDate
+        val fromTimeView: TextView = viewBinding.textFromTime
+        val toTimeView: TextView = viewBinding.textToTime
 
         recurrentTransactionEditViewModel.spinnerFundContent.observe(this, Observer { spinnerData ->
             val spinnerAdapter: ArrayAdapter<Fund> =
@@ -140,31 +149,31 @@ class RecurrentTransactionEditFragment : Fragment() {
     private fun validateRecurrentTransactionInput(selected: Option<RecurrentTransaction>): Option<RecurrentTransaction> {
         val root = view.toOption()
         return root.flatMap {
-            val spinnerFromFund: Spinner = it.findViewById<Spinner>(R.id.spinnerFromFundSelection)
+            val spinnerFromFund: Spinner = viewBinding.spinnerFromFundSelection
             val selectedFromFund: Option<Fund> =
                 spinnerFromFund.selectedItem.toOption().map { it as Fund }
 
-            val spinnerToFund: Spinner = it.findViewById<Spinner>(R.id.spinnerToFundSelection)
+            val spinnerToFund: Spinner = viewBinding.spinnerToFundSelection
             val selectedToFund: Option<Fund> =
                 spinnerToFund.selectedItem.toOption().map { it as Fund }
 
             selectedFromFund.flatMap { fromFund: Fund ->
                 selectedToFund.map { toFund: Fund ->
 
-                    val fundFlow: TextView = it.findViewById(R.id.textFundFlowValue)
+                    val fundFlow: TextView = viewBinding.textFundFlowValue
                     val fundFlowValue = BigDecimal(fundFlow.text.toString())
 
-                    val fromDateView: TextView = it.findViewById(R.id.textFromDate)
+                    val fromDateView: TextView = viewBinding.textFromDate
                     val selectedFromDate: LocalDate =
                         LocalDate.parse(fromDateView.text.toString(), dateFormat)
 
-                    val toDateView: TextView = it.findViewById(R.id.textToDate)
+                    val toDateView: TextView = viewBinding.textToDate
                     val selectedToDate = LocalDate.parse(toDateView.text.toString(), dateFormat)
 
-                    val fromTimeView: TextView = it.findViewById(R.id.textFromTime)
+                    val fromTimeView: TextView = viewBinding.textFromTime
                     val selectedFromTime = LocalTime.parse(fromTimeView.text.toString(), timeFormat)
 
-                    val toTimeView: TextView = it.findViewById(R.id.textToTime)
+                    val toTimeView: TextView = viewBinding.textToTime
                     val selectedToTime = LocalTime.parse(toTimeView.text.toString(), timeFormat)
 
                     val selectedFromDateTime = LocalDateTime.of(selectedFromDate, selectedFromTime)
