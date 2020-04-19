@@ -19,7 +19,8 @@ import com.rimanware.fundflow_android.ui.fund.fund_view.SelectedFundViewModelCon
 import java.math.BigDecimal
 import java.util.*
 
-class FundFlowCardViewFragment : ViewBindingFragment<FragmentFundFlowCardBinding>() {
+class FundFlowCardViewFragment() :
+    ViewBindingFragment<FragmentFundFlowCardBinding>() {
 
     private val fundCardViewViewModel: FundFlowCardViewViewModel by viewModels()
     private val viewModelContract: SelectedFundViewModelContract by viewModelContracts()

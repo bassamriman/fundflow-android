@@ -2,6 +2,7 @@ package com.rimanware.fundflow_android.ui.common
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
@@ -18,5 +19,19 @@ fun <T> Fragment.viewModelContract(): T {
 fun <T> registerViewModelContract(viewModelContract: Class<T>): Bundle {
     return Bundle().apply {
         putSerializable(VM_KEY, ClassArg(viewModelContract))
+    }
+}
+
+class ViewModelContractFragmentFactoryImpl<T, F : Fragment>(
+    private val contract: Class<T>,
+    private val fragmentIdentifierClass: Class<F>,
+    private val fragmentConstructor: (Class<T>) -> F
+) :
+    FragmentFactory() {
+    override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
+        return when (className) {
+            fragmentIdentifierClass.name -> fragmentConstructor(contract)
+            else -> super.instantiate(classLoader, className)
+        }
     }
 }

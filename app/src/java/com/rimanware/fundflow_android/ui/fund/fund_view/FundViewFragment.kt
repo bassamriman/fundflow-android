@@ -13,6 +13,7 @@ import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
 import com.rimanware.fundflow_android.databinding.FragmentFundViewBinding
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
+import com.rimanware.fundflow_android.ui.common.ViewModelContractFragmentFactoryImpl
 import com.rimanware.fundflow_android.ui.common.viewModels
 import com.rimanware.fundflow_android.ui.fund.fund_flow_card_view.FundFlowCardViewFragment
 import fundflow.Fund
@@ -21,6 +22,16 @@ import fundflow.Fund
 class FundViewFragment : ViewBindingFragment<FragmentFundViewBinding>() {
 
     private val fundViewViewModel: FundViewViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        childFragmentManager.fragmentFactory = ViewModelContractFragmentFactoryImpl(
+            FundViewViewModel::class.java,
+            FundFlowCardViewFragment::class.java
+        ) {
+            FundFlowCardViewFragment.newInstance(it)
+        }
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
