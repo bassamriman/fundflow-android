@@ -4,11 +4,10 @@ import arrow.core.Option
 import arrow.core.getOption
 import fundflow.Fund
 import fundflow.FundRef
-import fundflow.ledgers.RecurrentTransaction
-import fundflow.ledgers.RecurrentTransactionFundView
-import fundflow.ledgers.RecurrentTransactionLedgerContext
-import fundflow.ledgers.RecurrentTransactionLedgerContextAPI
+import fundflow.ledgers.*
+import ledger.LedgerContextAPI
 import ledger.TransactionRef
+import java.time.LocalDateTime
 
 object DataManager {
     var recurrentTransactionLedgerContext = RecurrentTransactionLedgerContext.empty()
@@ -22,6 +21,17 @@ object DataManager {
     fun loadFundUsingRefId(id: String): Option<Fund> = loadFundUsingRef(FundRef(id))
     fun loadFundUsingRef(ref: FundRef): Option<Fund> = fundMap().getOption(ref)
     fun loadFundView(ref: FundRef): Option<RecurrentTransactionFundView> = fundViews.getOption(ref)
+
+    fun loadFundFlowView(
+        ref: FundRef,
+        dateTime: LocalDateTime
+    ): Option<CombinableRecurrentTransactionFundView> =
+        RecurrentTransactionLedgerContextAPI.run {
+            LedgerContextAPI.run {
+                recurrentTransactionLedgerContext.flowAt(dateTime)
+                    .view(ref, CombinableRecurrentTransactionFundViewFactory)
+            }
+        }
 
     fun saveFund(fund: Fund) {
         recurrentTransactionLedgerContext = RecurrentTransactionLedgerContextAPI.run {

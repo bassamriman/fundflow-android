@@ -46,8 +46,8 @@ class FundFlowCardViewViewModel : ViewModel() {
     }
 
     private fun showFund(fundView: RecurrentTransactionFundView): Unit {
-        _inFlow.value = Some(fundView.fundSummaries.summary.incomingFlow.flow.value)
-        _fundFlow.value = Some(fundView.fundSummaries.summary.fundFlow.flow.value)
-        _outFlow.value = Some(fundView.fundSummaries.summary.outgoingFlow.flow.value)
+        //_inFlow.value = Some(fundView.fundSummaries.summary.incomingFlow.flow.value)
+        //_fundFlow.value = Some(fundView.fundSummaries.summary.fundFlow.flow.value)
+        //_outFlow.value = Some(fundView.fundSummaries.summary.outgoingFlow.flow.value)
     }
 }
