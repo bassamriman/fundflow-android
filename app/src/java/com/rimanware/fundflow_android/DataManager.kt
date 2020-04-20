@@ -28,8 +28,9 @@ object DataManager {
     ): Option<CombinableRecurrentTransactionFundView> =
         RecurrentTransactionLedgerContextAPI.run {
             LedgerContextAPI.run {
-                recurrentTransactionLedgerContext.flowAt(dateTime)
+                val a = recurrentTransactionLedgerContext.flowAt(dateTime)
                     .view(ref, CombinableRecurrentTransactionFundViewFactory)
+                a
             }
         }
 

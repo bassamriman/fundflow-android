@@ -17,6 +17,8 @@ import com.rimanware.fundflow_android.ui.common.viewModelContracts
 import com.rimanware.fundflow_android.ui.common.viewModels
 import com.rimanware.fundflow_android.ui.fund.fund_view.SelectedFundViewModelContract
 import java.math.BigDecimal
+import java.time.Instant
+import java.time.ZoneId
 import java.util.*
 
 class FundFlowCardViewFragment() :
@@ -79,9 +81,15 @@ class FundFlowCardViewFragment() :
 
             val picker: MaterialDatePicker<*> = builder.build()
             picker.addOnPositiveButtonClickListener { selection: Any ->
+                val timestamp = selection as Long
                 launcher.text = picker.headerText
+                fundCardViewViewModel.selectDateTime(
+                    Instant.ofEpochMilli(timestamp).atZone(
+                        ZoneId.systemDefault()
+                    ).toLocalDate().atTime(0, 0)
+                )
             }
-            picker.show(parentFragmentManager, picker.toString())
+            picker.show(childFragmentManager, picker.toString())
         }
 
         val inFlowView: TextView = viewBinding.textInFlowValue
