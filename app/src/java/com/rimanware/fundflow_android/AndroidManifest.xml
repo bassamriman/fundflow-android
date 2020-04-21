@@ -10,7 +10,7 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.App">
         <activity
-                android:name=".ItemsActivity"
+                android:name=".ui.core.AppActivity"
                 android:label="FundFlow"
                 android:theme="@style/Theme.App.NoActionBar">
             <intent-filter>

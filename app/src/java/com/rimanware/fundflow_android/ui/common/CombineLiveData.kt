@@ -6,7 +6,6 @@ import arrow.core.Option
 import arrow.core.extensions.option.monad.flatten
 import arrow.core.toOption
 
-
 fun <T1, T2> combineTuple(
     f1: LiveData<Option<T1>>,
     f2: LiveData<Option<T2>>

@@ -9,6 +9,7 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: "kotlin-kapt"
 
 def srcDirs = [
+        'ui/core',
         'ui/fund/fund_edit',
         'ui/fund/fund_list',
         'ui/fund/fund_view',

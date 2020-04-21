@@ -1,5 +1,6 @@
 package com.rimanware.fundflow_android.ui.common
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import arrow.core.None
 import arrow.core.Option
