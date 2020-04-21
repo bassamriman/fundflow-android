@@ -13,11 +13,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.rimanware.fundflow_android.R
 import com.rimanware.fundflow_android.databinding.ActivityAppBinding
+import com.rimanware.fundflow_android.ui.common.viewModels
 
 class AppActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var activityAppBinding: ActivityAppBinding
+    private val appViewModel: AppViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,4 +56,5 @@ class AppActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
 }

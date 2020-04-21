@@ -7,25 +7,29 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.util.Pair
 import androidx.lifecycle.Observer
-import arrow.core.Option
+import arrow.core.*
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.monad.flatten
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.databinding.FragmentFundFlowCardBinding
-import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
-import com.rimanware.fundflow_android.ui.common.registerViewModelContract
-import com.rimanware.fundflow_android.ui.common.viewModelContracts
-import com.rimanware.fundflow_android.ui.common.viewModels
+import com.rimanware.fundflow_android.ui.common.*
+import com.rimanware.fundflow_android.ui.core.AppViewModel
+import com.rimanware.fundflow_android.ui.core.GlobalDateTimeProviderModelViewContract
 import com.rimanware.fundflow_android.ui.fund.fund_view.SelectedFundViewModelContract
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.ZoneId
 import java.util.*
 
-class FundFlowCardViewFragment() :
+class FundFlowCardViewFragment :
     ViewBindingFragment<FragmentFundFlowCardBinding>() {
 
     private val fundCardViewViewModel: FundFlowCardViewViewModel by viewModels()
-    private val viewModelContract: SelectedFundViewModelContract by viewModelContracts()
+    private val viewModelContract: SelectedFundViewModelContract by viewModelContracts(VM_KEY)
+    private val globalDateTimeProviderModelViewContract:
+            GlobalDateTimeProviderModelViewContract by viewModelContracts(GLOBAL_VM_KEY)
 
     private var today: Long = 0
     private var nextMonth: Long = 0
@@ -121,13 +125,62 @@ class FundFlowCardViewFragment() :
             fundCardViewViewModel.selectFund(it)
         })
 
+        val selectedDateTimeGlobalTimeTuple =
+            combineTuple(
+                fundCardViewViewModel.maybeSelectedDateTime,
+                globalDateTimeProviderModelViewContract.globalDateTime
+            )
+
+        selectedDateTimeGlobalTimeTuple.observe(
+            this,
+            Observer { maybeSelectedDateTimeGlobalTimeTuple ->
+                maybeSelectedDateTimeGlobalTimeTuple.toOption().map {
+                    val (maybeSelectedDateTime, maybeGlobalTime) = it
+                    maybeSelectedDateTime.map {
+                        fundCardViewViewModel.setDateTimeToComputeFlowAt(Some(it))
+                    }.getOrElse {
+                        maybeGlobalTime.map {
+                            fundCardViewViewModel.setDateTimeToComputeFlowAt(Some(it))
+                        }.getOrElse {
+                            fundCardViewViewModel.setDateTimeToComputeFlowAt(None)
+                        }
+                    }
+                }
+            })
+
+        fundCardViewViewModel.computationDateTimeAndFundTuple.observe(
+            this,
+            Observer { maybeComputationDateTimeAndFundTuple ->
+                val maybeFundFlowView = maybeComputationDateTimeAndFundTuple.toOption().map {
+                    val (maybeFund, maybeLocalDateTime) = it
+                    Option.applicative().map(
+                        maybeFund,
+                        maybeLocalDateTime
+                    ) { (previouslySelectedFund, selectedDateTime) ->
+                        val a = DataManager.loadFundFlowView(
+                            previouslySelectedFund.reference,
+                            selectedDateTime
+                        )
+                        a
+                    }.fix().flatten()
+                }.flatten()
+                fundCardViewViewModel.selectFunFlowView(maybeFundFlowView)
+            })
+
+        fundCardViewViewModel.selectedFundFlowView.observe(
+            this,
+            Observer { fundCardViewViewModel.showFund(it) })
+
         return root
     }
 
     companion object {
         fun <T : SelectedFundViewModelContract> newInstance(contract: Class<T>): FundFlowCardViewFragment {
             return FundFlowCardViewFragment().apply {
-                val bundle = registerViewModelContract(contract)
+                val bundle =
+                    Bundle()
+                        .registerViewModelContract(VM_KEY, contract)
+                        .registerViewModelContract(GLOBAL_VM_KEY, AppViewModel::class.java)
                 arguments = bundle
             }
         }
