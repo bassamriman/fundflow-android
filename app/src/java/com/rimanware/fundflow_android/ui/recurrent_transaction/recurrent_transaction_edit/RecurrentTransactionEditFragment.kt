@@ -19,7 +19,7 @@ import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
 import com.rimanware.fundflow_android.ui.common.viewModels
 import com.rimanware.fundflow_android.ui.fund.fund_list.FundListViewModel
 import com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transaction_list.RecurrentTransactionListViewModel
-import common.Daily
+import common.unit.Daily
 import common.DateTimeInterval
 import fundflow.DailyFlow
 import fundflow.Fund
@@ -199,7 +199,9 @@ class RecurrentTransactionEditFragment :
                         )
                     }.getOrElse {
                         RecurrentTransaction(
-                            RecurrentTransactionQuantification(DailyFlow(fundFlowValue, Daily)),
+                            RecurrentTransactionQuantification(DailyFlow(fundFlowValue,
+                                Daily
+                            )),
                             RecurrentTransactionDetail(
                                 DateTimeInterval(
                                     selectedFromDateTime,
