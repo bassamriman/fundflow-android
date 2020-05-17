@@ -7,21 +7,33 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.util.Pair
 import androidx.lifecycle.Observer
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.monad.flatten
+import arrow.core.fix
+import arrow.core.getOrElse
+import arrow.core.toOption
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.databinding.FragmentFundFlowCardBinding
-import com.rimanware.fundflow_android.ui.common.*
+import com.rimanware.fundflow_android.ui.common.GLOBAL_VM_KEY
+import com.rimanware.fundflow_android.ui.common.VM_KEY
+import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
+import com.rimanware.fundflow_android.ui.common.combineTuple
+import com.rimanware.fundflow_android.ui.common.registerViewModelContract
+import com.rimanware.fundflow_android.ui.common.viewModelContracts
+import com.rimanware.fundflow_android.ui.common.viewModels
 import com.rimanware.fundflow_android.ui.core.AppViewModel
 import com.rimanware.fundflow_android.ui.core.GlobalDateTimeProviderModelViewContract
 import com.rimanware.fundflow_android.ui.fund.fund_view.SelectedFundViewModelContract
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.ZoneId
-import java.util.*
+import java.util.Calendar
+import java.util.TimeZone
 
 class FundFlowCardViewFragment :
     ViewBindingFragment<FragmentFundFlowCardBinding>() {
@@ -29,7 +41,7 @@ class FundFlowCardViewFragment :
     private val fundCardViewViewModel: FundFlowCardViewViewModel by viewModels()
     private val viewModelContract: SelectedFundViewModelContract by viewModelContracts(VM_KEY)
     private val globalDateTimeProviderModelViewContract:
-            GlobalDateTimeProviderModelViewContract by viewModelContracts(GLOBAL_VM_KEY)
+        GlobalDateTimeProviderModelViewContract by viewModelContracts(GLOBAL_VM_KEY)
 
     private var today: Long = 0
     private var nextMonth: Long = 0
@@ -100,28 +112,34 @@ class FundFlowCardViewFragment :
         val fundFlowView: TextView = viewBinding.textFundFlowValue
         val outFlowView: TextView = viewBinding.textOutFlowValue
 
-        fundCardViewViewModel.inFlow.observe(this, Observer { maybeInFlow: Option<BigDecimal> ->
-            maybeInFlow.map {
-                val test = "$${it.setScale(2)}/Day"
-                inFlowView.text = test
-            }
-        })
+        fundCardViewViewModel.inFlow.observe(
+            viewLifecycleOwner,
+            Observer { maybeInFlow: Option<BigDecimal> ->
+                maybeInFlow.map {
+                    val test = "$${it.setScale(2)}/Day"
+                    inFlowView.text = test
+                }
+            })
 
-        fundCardViewViewModel.fundFlow.observe(this, Observer { maybeFundFlow: Option<BigDecimal> ->
-            maybeFundFlow.map {
-                val test = "$${it.setScale(2)}/Day"
-                fundFlowView.text = test
-            }
-        })
+        fundCardViewViewModel.fundFlow.observe(
+            viewLifecycleOwner,
+            Observer { maybeFundFlow: Option<BigDecimal> ->
+                maybeFundFlow.map {
+                    val test = "$${it.setScale(2)}/Day"
+                    fundFlowView.text = test
+                }
+            })
 
-        fundCardViewViewModel.outFlow.observe(this, Observer { maybeOutFlow: Option<BigDecimal> ->
-            maybeOutFlow.map {
-                val test = "$${it.setScale(2)}/Day"
-                outFlowView.text = test
-            }
-        })
+        fundCardViewViewModel.outFlow.observe(
+            viewLifecycleOwner,
+            Observer { maybeOutFlow: Option<BigDecimal> ->
+                maybeOutFlow.map {
+                    val test = "$${it.setScale(2)}/Day"
+                    outFlowView.text = test
+                }
+            })
 
-        viewModelContract.selectedFund.observe(this, Observer {
+        viewModelContract.selectedFund.observe(viewLifecycleOwner, Observer {
             fundCardViewViewModel.selectFund(it)
         })
 
@@ -132,7 +150,7 @@ class FundFlowCardViewFragment :
             )
 
         selectedDateTimeGlobalTimeTuple.observe(
-            this,
+            viewLifecycleOwner,
             Observer { maybeSelectedDateTimeGlobalTimeTuple ->
                 maybeSelectedDateTimeGlobalTimeTuple.toOption().map {
                     val (maybeSelectedDateTime, maybeGlobalTime) = it
@@ -149,7 +167,7 @@ class FundFlowCardViewFragment :
             })
 
         fundCardViewViewModel.computationDateTimeAndFundTuple.observe(
-            this,
+            viewLifecycleOwner,
             Observer { maybeComputationDateTimeAndFundTuple ->
                 val maybeFundFlowView = maybeComputationDateTimeAndFundTuple.toOption().map {
                     val (maybeFund, maybeLocalDateTime) = it
@@ -168,7 +186,7 @@ class FundFlowCardViewFragment :
             })
 
         fundCardViewViewModel.selectedFundFlowView.observe(
-            this,
+            viewLifecycleOwner,
             Observer { fundCardViewViewModel.showFund(it) })
 
         return root

@@ -1,6 +1,10 @@
 package com.rimanware.fundflow_android.ui.fund.fund_edit
 
-import arrow.core.*
+import arrow.core.Invalid
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Valid
+import arrow.core.Validated
 import com.google.android.material.textfield.TextInputLayout
 import com.rimanware.fundflow_android.ui.common.StringRules
 import com.rimanware.fundflow_android.ui.common.ValidationError

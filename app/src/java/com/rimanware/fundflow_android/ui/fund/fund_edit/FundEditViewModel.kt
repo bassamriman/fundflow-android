@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import com.rimanware.fundflow_android.DataManager
 import fundflow.Fund
 import fundflow.ledgers.RecurrentTransactionFundView
 

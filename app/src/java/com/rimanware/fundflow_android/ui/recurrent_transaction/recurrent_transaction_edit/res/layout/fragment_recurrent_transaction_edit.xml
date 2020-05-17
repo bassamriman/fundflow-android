@@ -54,6 +54,7 @@
         android:ems="10"
         android:gravity="start|top"
         android:hint="Fund Flow"
+        android:inputType="numberDecimal"
         app:prefixText="$"
         app:counterEnabled="true"
         app:errorEnabled="true"
@@ -63,7 +64,8 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 

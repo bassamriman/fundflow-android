@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
 import com.rimanware.fundflow_android.ui.common.ClassArg
-import fundflow.FlowOps
 import fundflow.ledgers.RecurrentTransaction
 
 class RecurrentTransactionListAdapter(
@@ -58,10 +57,8 @@ class RecurrentTransactionListAdapter(
         DataManager.loadFundUsingRef(recurrentTransaction.transactionCoordinates.destination)
             .map { holder.textToValue?.text = it.name }
 
-        val dailyFlow = FlowOps.run {
-            recurrentTransaction.quantification.flow.toDailyFlow()
-        }
-        val fundFlowAsString = "$${dailyFlow.value}/Day"
+        val flow = recurrentTransaction.quantification.flow
+        val fundFlowAsString = "$${flow.value} ${flow.unit.perAlias}"
         holder.textFundFlowValue?.text = fundFlowAsString
     }
 }
