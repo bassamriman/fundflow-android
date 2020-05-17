@@ -19,13 +19,16 @@ import com.rimanware.fundflow_android.databinding.FragmentFundEditBinding
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
 import com.rimanware.fundflow_android.ui.common.viewModelContracts
 import com.rimanware.fundflow_android.ui.common.viewModels
+import com.rimanware.fundflow_android.ui.fund.fund_list.FUND_LIST_VM_KEY
 import com.rimanware.fundflow_android.ui.fund.fund_list.UpdateFundListViewModelContract
 import fundflow.Fund
 
 class FundEditFragment : ViewBindingFragment<FragmentFundEditBinding>() {
 
     private val fundEditViewModel: FundEditViewModel by viewModels()
-    private val modelViewContract: UpdateFundListViewModelContract by viewModelContracts()
+    private val modelViewContract: UpdateFundListViewModelContract by viewModelContracts(
+        FUND_LIST_VM_KEY
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,8 +41,16 @@ class FundEditFragment : ViewBindingFragment<FragmentFundEditBinding>() {
         val titleView: TextInputLayout = viewBinding.textFundTitle
         val descriptionView: TextInputLayout = viewBinding.textFundText
 
+        fundEditViewModel.selectedFund.observe(
+            viewLifecycleOwner,
+            Observer { maybeFund ->
+                maybeFund.map { fund: Fund ->
+                    DataManager.loadFundView(fund.reference).map { fundEditViewModel.showFund(it) }
+                }
+            })
+
         fundEditViewModel.titleOfSelectedFund.observe(
-            this,
+            viewLifecycleOwner,
             Observer { maybeTitle: Option<String> ->
                 maybeTitle.map { title ->
                     titleView.editText?.setText(title)
@@ -47,7 +58,7 @@ class FundEditFragment : ViewBindingFragment<FragmentFundEditBinding>() {
             })
 
         fundEditViewModel.descriptionOfSelectedFund.observe(
-            this,
+            viewLifecycleOwner,
             Observer { maybeDescription: Option<String> ->
                 maybeDescription.map { description ->
                     descriptionView.editText?.setText(description)
@@ -57,6 +68,8 @@ class FundEditFragment : ViewBindingFragment<FragmentFundEditBinding>() {
         val safeArgs: FundEditFragmentArgs by navArgs()
         val selectedFundRef = safeArgs.selectedFund
         val selectedFund = maybeSelectedFund(selectedFundRef)
+
+        fundEditViewModel.selectFund(selectedFund)
 
         titleView.editText?.doOnTextChanged { inputText, _, _, _ ->
             FundEditValidation.handleFundTitleValidation(

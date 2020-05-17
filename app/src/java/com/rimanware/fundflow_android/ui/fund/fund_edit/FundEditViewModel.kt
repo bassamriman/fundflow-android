@@ -28,15 +28,7 @@ class FundEditViewModel : ViewModel() {
     }
     val descriptionOfSelectedFund: LiveData<Option<String>> by lazy { _descriptionOfSelectedFund }
 
-    init {
-        selectedFund.observeForever { maybeFund ->
-            maybeFund.map { fund: Fund ->
-                DataManager.loadFundView(fund.reference).map { showFund(it) }
-            }
-        }
-    }
-
-    private fun showFund(fundView: RecurrentTransactionFundView) {
+    fun showFund(fundView: RecurrentTransactionFundView) {
         _titleOfSelectedFund.value = Some(fundView.fund.name)
         _descriptionOfSelectedFund.value = Some(fundView.fund.description)
     }

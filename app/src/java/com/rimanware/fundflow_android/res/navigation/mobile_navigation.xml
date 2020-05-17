@@ -27,7 +27,7 @@
             android:name="selectedFund"
             app:argType="string" />
         <argument
-            android:name="modelViewKeyContract"
+            android:name="fundListViewModelContractKey"
             app:argType="com.rimanware.fundflow_android.ui.common.ClassArg" />
     </fragment>
 
@@ -59,6 +59,13 @@
         <argument
             android:name="selectedRecurrentTransaction"
             app:argType="string" />
+        <argument
+            android:name="recurrentTransactionListViewModelContractKey"
+            app:argType="com.rimanware.fundflow_android.ui.common.ClassArg" />
+        <argument
+            android:name="fundListViewModelContractKey"
+            app:argType="com.rimanware.fundflow_android.ui.common.ClassArg" />
+
     </fragment>
 
 

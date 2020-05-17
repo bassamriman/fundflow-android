@@ -11,10 +11,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
+import com.rimanware.fundflow_android.ui.common.ClassArg
 import fundflow.FlowOps
 import fundflow.ledgers.RecurrentTransaction
 
-class RecurrentTransactionListAdapter :
+class RecurrentTransactionListAdapter(
+    private val recurrentTransactionListViewModelClassArg: ClassArg,
+    private val fundListViewModelClassArg: ClassArg
+) :
     ListAdapter<RecurrentTransaction, RecurrentTransactionListViewHolder>(
         AsyncDifferConfig.Builder(object : DiffUtil.ItemCallback<RecurrentTransaction>() {
             override fun areItemsTheSame(
@@ -40,7 +44,11 @@ class RecurrentTransactionListAdapter :
         val layoutInflater: LayoutInflater = LayoutInflater.from(parent.context)
         val itemView: View =
             layoutInflater.inflate(R.layout.item_recurrent_transaction_list, parent, false)
-        return RecurrentTransactionListViewHolder(itemView)
+        return RecurrentTransactionListViewHolder(
+            itemView,
+            recurrentTransactionListViewModelClassArg,
+            fundListViewModelClassArg
+        )
     }
 
     override fun onBindViewHolder(holder: RecurrentTransactionListViewHolder, position: Int) {
@@ -58,7 +66,11 @@ class RecurrentTransactionListAdapter :
     }
 }
 
-class RecurrentTransactionListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class RecurrentTransactionListViewHolder(
+    itemView: View,
+    private val recurrentTransactionListViewModelClassArg: ClassArg,
+    private val fundListViewModelClassArg: ClassArg
+) : RecyclerView.ViewHolder(itemView) {
     val textFromValue = itemView.findViewById<TextView?>(R.id.textFromValue)
     val textToValue = itemView.findViewById<TextView?>(R.id.textToValue)
     val textFundFlowValue = itemView.findViewById<TextView?>(R.id.textFundFlowValue)
@@ -67,7 +79,9 @@ class RecurrentTransactionListViewHolder(itemView: View) : RecyclerView.ViewHold
         itemView.setOnClickListener {
             val action =
                 RecurrentTransactionListFragmentDirections.actionNavRecurrentTransactionListToNavRecurrentTransactionEdit(
-                    DataManager.loadAllRecurrentTransactions()[adapterPosition].reference.id
+                    DataManager.loadAllRecurrentTransactions()[adapterPosition].reference.id,
+                    recurrentTransactionListViewModelClassArg,
+                    fundListViewModelClassArg
                 )
             itemView.findNavController().navigate(action)
         }

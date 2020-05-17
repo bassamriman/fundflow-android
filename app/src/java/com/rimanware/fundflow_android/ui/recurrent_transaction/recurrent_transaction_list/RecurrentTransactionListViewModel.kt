@@ -6,7 +6,10 @@ import androidx.lifecycle.ViewModel
 import com.rimanware.fundflow_android.DataManager
 import fundflow.ledgers.RecurrentTransaction
 
-class RecurrentTransactionListViewModel : ViewModel() {
+const val RECURRENT_TRANSACTION_LIST_VM_KEY = "recurrentTransactionListViewModelContractKey"
+
+class RecurrentTransactionListViewModel : ViewModel(),
+    UpdateRecurrentTransactionListViewModelContract {
 
     private val _recurrentTransactions by lazy {
         MutableLiveData<List<RecurrentTransaction>>().apply {
@@ -16,9 +19,13 @@ class RecurrentTransactionListViewModel : ViewModel() {
 
     val recurrentTransactions: LiveData<List<RecurrentTransaction>> = _recurrentTransactions
 
-    fun updateRecurrentTransactionList() {
+    override fun updateRecurrentTransactionList() {
         _recurrentTransactions.apply {
             value = DataManager.loadAllRecurrentTransactions()
         }
     }
+}
+
+interface UpdateRecurrentTransactionListViewModelContract {
+    fun updateRecurrentTransactionList(): Unit
 }

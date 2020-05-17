@@ -2,7 +2,6 @@ package com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transa
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import arrow.core.None
 import arrow.core.Option
@@ -15,10 +14,10 @@ import java.time.LocalDateTime
 
 class RecurrentTransactionEditViewModel : ViewModel() {
 
-    private val _spinnerFundContent by lazy {
+    private val _dropdownFundContent by lazy {
         MutableLiveData<List<Fund>>().apply { value = DataManager.loadAllFunds() }
     }
-    val spinnerFundContent: LiveData<List<Fund>> by lazy { _spinnerFundContent }
+    val dropdownFundContent: LiveData<List<Fund>> by lazy { _dropdownFundContent }
 
     private val _fromFund by lazy {
         MutableLiveData<Option<Fund>>().apply { value = None }
@@ -53,25 +52,21 @@ class RecurrentTransactionEditViewModel : ViewModel() {
     private val _selectedRecurrentTransaction by lazy {
         MutableLiveData<Option<RecurrentTransaction>>().apply { value = Option.empty() }
     }
-    private val selectedRecurrentTransaction: LiveData<Option<RecurrentTransaction>> by lazy { _selectedRecurrentTransaction }
+    val selectedRecurrentTransaction: LiveData<Option<RecurrentTransaction>> by lazy { _selectedRecurrentTransaction }
 
-    init {
-        selectedRecurrentTransaction.observeForever(Observer { maybeRecurrentTransaction ->
-            maybeRecurrentTransaction.map { showRecurrentTransaction(it) }
-        })
-    }
-
-    private fun showRecurrentTransaction(recurrentTransaction: RecurrentTransaction) {
-        _fromFund.value = DataManager.loadFundUsingRef(recurrentTransaction.transactionCoordinates.source)
-        _toFund.value = DataManager.loadFundUsingRef(recurrentTransaction.transactionCoordinates.destination)
+    fun showRecurrentTransaction(recurrentTransaction: RecurrentTransaction) {
+        _fromFund.value =
+            DataManager.loadFundUsingRef(recurrentTransaction.transactionCoordinates.source)
+        _toFund.value =
+            DataManager.loadFundUsingRef(recurrentTransaction.transactionCoordinates.destination)
         _fromLocalDateTime.value = Some(recurrentTransaction.details.recurrence.from)
         _toLocalDateTime.value = Some(recurrentTransaction.details.recurrence.to)
         _fundFlowValue.value = Some(recurrentTransaction.quantification.flow.value)
         _fundFlowUnit.value = Some(recurrentTransaction.quantification.flow.unit.toString())
     }
 
-    fun setFundList(funds: List<Fund>) {
-        _spinnerFundContent.value = funds
+    fun setDropdownFundList(funds: List<Fund>) {
+        _dropdownFundContent.value = funds
     }
 
     fun selectRecurrentTransaction(recurrentTransaction: Option<RecurrentTransaction>) {
