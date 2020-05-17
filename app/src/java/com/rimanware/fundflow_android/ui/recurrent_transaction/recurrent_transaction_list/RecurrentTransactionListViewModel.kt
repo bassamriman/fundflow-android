@@ -16,7 +16,7 @@ class RecurrentTransactionListViewModel : ViewModel() {
 
     val recurrentTransactions: LiveData<List<RecurrentTransaction>> = _recurrentTransactions
 
-    fun updateRecurrentTransactionList(): Unit {
+    fun updateRecurrentTransactionList() {
         _recurrentTransactions.apply {
             value = DataManager.loadAllRecurrentTransactions()
         }

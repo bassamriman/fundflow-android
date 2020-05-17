@@ -13,7 +13,6 @@ import com.rimanware.fundflow_android.ui.common.ClassArg
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
 import com.rimanware.fundflow_android.ui.common.viewModels
 
-
 class FundListFragment : ViewBindingFragment<FragmentFundListBinding>() {
 
     private val fundListViewModel: FundListViewModel by viewModels()
@@ -34,7 +33,7 @@ class FundListFragment : ViewBindingFragment<FragmentFundListBinding>() {
 
         val root = viewBinding.root
 
-        //Setup recycler view
+        // Setup recycler view
         val recyclerView = viewBinding.listItems
 
         val fundListAdapter = FundListAdapter()
@@ -59,6 +58,4 @@ class FundListFragment : ViewBindingFragment<FragmentFundListBinding>() {
 
         return root
     }
-
-
 }

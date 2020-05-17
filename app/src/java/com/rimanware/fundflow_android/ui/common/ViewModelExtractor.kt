@@ -11,7 +11,7 @@ fun <T> Fragment.viewModelContracts(): Lazy<T> {
     }
 }
 
-fun <T> Fragment.viewModelContracts(key : String): Lazy<T> {
+fun <T> Fragment.viewModelContracts(key: String): Lazy<T> {
     return lazy {
         this.viewModelContract<T>(key)
     }

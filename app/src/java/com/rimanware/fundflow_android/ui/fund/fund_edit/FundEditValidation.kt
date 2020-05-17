@@ -6,7 +6,6 @@ import com.rimanware.fundflow_android.ui.common.StringRules
 import com.rimanware.fundflow_android.ui.common.ValidationError
 import com.rimanware.fundflow_android.ui.fund.FundRules
 
-
 object FundEditValidation {
     private val titleCharLimit: Int = 20
     private val descriptionCharLimit: Int = 120

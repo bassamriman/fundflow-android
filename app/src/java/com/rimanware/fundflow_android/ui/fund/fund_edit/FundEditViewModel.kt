@@ -12,7 +12,7 @@ import fundflow.ledgers.RecurrentTransactionFundView
 
 class FundEditViewModel : ViewModel() {
 
-    //Selected Fund Bindings
+    // Selected Fund Bindings
     private val _selectedFund by lazy {
         MutableLiveData<Option<Fund>>().apply { value = None }
     }
@@ -45,7 +45,7 @@ class FundEditViewModel : ViewModel() {
         _selectedFund.value = maybeFund
     }
 
-    //User Input
+    // User Input
     private val _validTitleInput by lazy {
         MutableLiveData<Option<String>>().apply { value = None }
     }
@@ -65,6 +65,4 @@ class FundEditViewModel : ViewModel() {
     fun setValidDescriptionInput(maybeDescription: Option<String>) {
         _validDescriptionInput.value = maybeDescription
     }
-
-
 }

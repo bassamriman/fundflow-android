@@ -1,8 +1,6 @@
 package com.rimanware.fundflow_android.ui.common
 
-import arrow.core.None
 import arrow.core.Option
-import arrow.core.Some
 import arrow.core.getOrElse
 import kotlin.reflect.KProperty
 
@@ -16,12 +14,8 @@ class Delegat2e {
     }
 }
 
-
 class OptionCheckerDelegate<T>(private var option: Option<T>, private val errorMessage: String = "Value is not set") {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T = option.getOrElse {
         throw IllegalStateException(errorMessage)
     }
 }
-
-
-

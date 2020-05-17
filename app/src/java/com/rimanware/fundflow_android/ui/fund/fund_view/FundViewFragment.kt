@@ -18,7 +18,6 @@ import com.rimanware.fundflow_android.ui.common.viewModels
 import com.rimanware.fundflow_android.ui.fund.fund_flow_card_view.FundFlowCardViewFragment
 import fundflow.Fund
 
-
 class FundViewFragment : ViewBindingFragment<FragmentFundViewBinding>() {
 
     private val fundViewViewModel: FundViewViewModel by viewModels()

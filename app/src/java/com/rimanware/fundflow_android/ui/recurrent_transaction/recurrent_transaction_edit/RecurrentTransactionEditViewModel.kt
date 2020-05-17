@@ -61,7 +61,7 @@ class RecurrentTransactionEditViewModel : ViewModel() {
         })
     }
 
-    private fun showRecurrentTransaction(recurrentTransaction: RecurrentTransaction): Unit {
+    private fun showRecurrentTransaction(recurrentTransaction: RecurrentTransaction) {
         _fromFund.value = DataManager.loadFundUsingRef(recurrentTransaction.transactionCoordinates.source)
         _toFund.value = DataManager.loadFundUsingRef(recurrentTransaction.transactionCoordinates.destination)
         _fromLocalDateTime.value = Some(recurrentTransaction.details.recurrence.from)
@@ -70,11 +70,11 @@ class RecurrentTransactionEditViewModel : ViewModel() {
         _fundFlowUnit.value = Some(recurrentTransaction.quantification.flow.unit.toString())
     }
 
-    fun setFundList(funds: List<Fund>): Unit {
+    fun setFundList(funds: List<Fund>) {
         _spinnerFundContent.value = funds
     }
 
-    fun selectRecurrentTransaction(recurrentTransaction: Option<RecurrentTransaction>): Unit {
+    fun selectRecurrentTransaction(recurrentTransaction: Option<RecurrentTransaction>) {
         _selectedRecurrentTransaction.value = recurrentTransaction
     }
 }

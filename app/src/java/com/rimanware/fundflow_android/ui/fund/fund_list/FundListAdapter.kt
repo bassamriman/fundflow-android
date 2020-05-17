@@ -36,7 +36,6 @@ class FundListAdapter : ListAdapter<Fund, FundListViewHolder>(
         holder.textTitle?.text = fund.name
         holder.textDesciption?.text = fund.description
     }
-
 }
 
 class FundListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -51,4 +50,3 @@ class FundListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
     }
 }
-

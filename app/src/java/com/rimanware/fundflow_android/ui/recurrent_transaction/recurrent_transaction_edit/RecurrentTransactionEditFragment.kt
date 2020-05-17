@@ -19,19 +19,19 @@ import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
 import com.rimanware.fundflow_android.ui.common.viewModels
 import com.rimanware.fundflow_android.ui.fund.fund_list.FundListViewModel
 import com.rimanware.fundflow_android.ui.recurrent_transaction.recurrent_transaction_list.RecurrentTransactionListViewModel
-import common.unit.Daily
 import common.DateTimeInterval
+import common.unit.Daily
 import fundflow.DailyFlow
 import fundflow.Fund
 import fundflow.ledgers.RecurrentTransaction
 import fundflow.ledgers.RecurrentTransactionDetail
 import fundflow.ledgers.RecurrentTransactionQuantification
-import ledger.TransactionCoordinates
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import ledger.TransactionCoordinates
 
 class RecurrentTransactionEditFragment :
     ViewBindingFragment<FragmentRecurrentTransactionEditBinding>() {
@@ -58,12 +58,12 @@ class RecurrentTransactionEditFragment :
 
         val root = viewBinding.root
 
-        //Get the fundListViewModel
+        // Get the fundListViewModel
         val fundListViewModel = activity?.run {
             ViewModelProvider(this).get(FundListViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
 
-        //Set spinner content
+        // Set spinner content
         fundListViewModel.funds.observe(this, Observer {
             recurrentTransactionEditViewModel.setFundList(it)
         })
@@ -216,8 +216,6 @@ class RecurrentTransactionEditFragment :
                     }
                 }
             }
-
-
         }
     }
 

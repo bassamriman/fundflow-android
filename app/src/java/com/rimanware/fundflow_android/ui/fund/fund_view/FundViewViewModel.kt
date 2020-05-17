@@ -37,7 +37,7 @@ class FundViewViewModel : ViewModel(), SelectedFundViewModelContract {
         }
     }
 
-    private fun showFund(fund: Fund): Unit {
+    private fun showFund(fund: Fund) {
         _title.value = Some(fund.name)
         _description.value = Some(fund.description)
     }

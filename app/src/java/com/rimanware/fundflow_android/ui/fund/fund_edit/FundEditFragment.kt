@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import arrow.core.Option
 import arrow.core.extensions.option.applicative.applicative
@@ -55,7 +53,6 @@ class FundEditFragment : ViewBindingFragment<FragmentFundEditBinding>() {
                     descriptionView.editText?.setText(description)
                 }
             })
-
 
         val safeArgs: FundEditFragmentArgs by navArgs()
         val selectedFundRef = safeArgs.selectedFund

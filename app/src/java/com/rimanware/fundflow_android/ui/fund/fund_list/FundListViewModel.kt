@@ -16,7 +16,7 @@ class FundListViewModel : ViewModel(), UpdateFundListViewModelContract {
 
     val funds: LiveData<List<Fund>> = _funds
 
-    override fun updateFundList(): Unit {
+    override fun updateFundList() {
         _funds.apply {
             value = DataManager.loadAllFunds()
         }

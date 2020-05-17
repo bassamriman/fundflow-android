@@ -56,7 +56,6 @@ class RecurrentTransactionListAdapter :
         val fundFlowAsString = "$${dailyFlow.value}/Day"
         holder.textFundFlowValue?.text = fundFlowAsString
     }
-
 }
 
 class RecurrentTransactionListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -74,4 +73,3 @@ class RecurrentTransactionListViewHolder(itemView: View) : RecyclerView.ViewHold
         }
     }
 }
-

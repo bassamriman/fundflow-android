@@ -33,7 +33,6 @@ class FundFlowCardViewViewModel : ViewModel() {
         _maybeSelectedFund.value = maybeFund
     }
 
-
     private val _inFlow by lazy {
         MutableLiveData<Option<BigDecimal>>().apply { value = Some(BigDecimal.ZERO) }
     }
@@ -62,16 +61,15 @@ class FundFlowCardViewViewModel : ViewModel() {
     }
     val selectedFundFlowView: LiveData<Option<CombinableRecurrentTransactionFundView>> by lazy { _selectedFundFlowView }
 
-
-    fun setDateTimeToComputeFlowAt(computeAt: Option<LocalDateTime>): Unit {
+    fun setDateTimeToComputeFlowAt(computeAt: Option<LocalDateTime>) {
         _dateTimeToComputeFlowAt.value = computeAt
     }
 
-    fun selectFunFlowView(selected: Option<CombinableRecurrentTransactionFundView>): Unit {
+    fun selectFunFlowView(selected: Option<CombinableRecurrentTransactionFundView>) {
         _selectedFundFlowView.value = selected
     }
 
-    fun showFund(maybeFundFlowView: Option<CombinableRecurrentTransactionFundView>): Unit {
+    fun showFund(maybeFundFlowView: Option<CombinableRecurrentTransactionFundView>) {
         maybeFundFlowView.map {
             _inFlow.value = Some(it.fundSummaries.summary.incomingFlow.flow.value)
             _fundFlow.value = Some(it.fundSummaries.summary.fundFlow.flow.value)

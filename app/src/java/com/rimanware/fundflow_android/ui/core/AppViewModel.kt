@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import arrow.core.Option
 import arrow.core.toOption
-import kotlinx.coroutines.delay
 import java.time.LocalDateTime
+import kotlinx.coroutines.delay
 
 class AppViewModel : ViewModel(), GlobalDateTimeProviderModelViewContract {
 

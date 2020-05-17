@@ -5,16 +5,16 @@ import arrow.core.getOption
 import fundflow.Fund
 import fundflow.FundRef
 import fundflow.ledgers.*
+import java.time.LocalDateTime
 import ledger.LedgerContextAPI
 import ledger.TransactionRef
-import java.time.LocalDateTime
 
 object DataManager {
     var recurrentTransactionLedgerContext = RecurrentTransactionLedgerContext.empty()
     var fundViews: Map<FundRef, RecurrentTransactionFundView> =
         RecurrentTransactionLedgerContextAPI.run { recurrentTransactionLedgerContext.viewAll() }
 
-    //Fund
+    // Fund
     private fun fundMap(): Map<FundRef, Fund> = recurrentTransactionLedgerContext.funds
     fun loadAllFunds(): List<Fund> = fundMap().values.toList()
 
@@ -42,7 +42,7 @@ object DataManager {
             RecurrentTransactionLedgerContextAPI.run { recurrentTransactionLedgerContext.viewAll() }
     }
 
-    //RecurrentTransaction
+    // RecurrentTransaction
     private fun recurrentTransactionMap(): Map<TransactionRef, RecurrentTransaction> =
         recurrentTransactionLedgerContext.recurrentTransactionLedger.transactions.map { it.reference to it }
             .toMap()

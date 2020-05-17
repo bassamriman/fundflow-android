@@ -6,7 +6,6 @@ import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-
 const val VM_KEY = "modelViewKeyContract"
 const val GLOBAL_VM_KEY = "globalModelViewKeyContract"
 
@@ -18,7 +17,7 @@ fun <T> Fragment.viewModelContract(key: String): T {
     return ViewModelProvider(requireActivity()).get(clazz) as T
 }
 
-fun <T> Bundle.registerViewModelContract(key : String, viewModelContract: Class<T>): Bundle {
+fun <T> Bundle.registerViewModelContract(key: String, viewModelContract: Class<T>): Bundle {
     return this.apply {
         putSerializable(key, ClassArg(viewModelContract))
     }

@@ -11,7 +11,6 @@ import com.rimanware.fundflow_android.databinding.FragmentRecurrentTransactionLi
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
 import com.rimanware.fundflow_android.ui.common.viewModels
 
-
 class RecurrentTransactionListFragment :
     ViewBindingFragment<FragmentRecurrentTransactionListBinding>() {
 
@@ -31,10 +30,10 @@ class RecurrentTransactionListFragment :
             )
         )
 
-        //Inflate View
+        // Inflate View
         val rootView: View = viewBinding.root
 
-        //Setup recycler view
+        // Setup recycler view
         val recyclerView = viewBinding.recurrentTransactionListItems
 
         val recurrentTransactionListAdapter = RecurrentTransactionListAdapter()
@@ -58,6 +57,4 @@ class RecurrentTransactionListFragment :
 
         return rootView
     }
-
-
 }
