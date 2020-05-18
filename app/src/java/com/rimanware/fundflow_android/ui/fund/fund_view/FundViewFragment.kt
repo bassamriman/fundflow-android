@@ -51,17 +51,19 @@ class FundViewFragment : ViewBindingFragment<FragmentFundViewBinding>() {
         val titleView: TextView = viewBinding.textFundTitle
         val descriptionView: TextView = viewBinding.textFundDescriptionValue
 
-        fundViewViewModel.title.observe(this, Observer { maybeTitle: Option<String> ->
+        fundViewViewModel.title.observe(viewLifecycleOwner, Observer { maybeTitle: Option<String> ->
             maybeTitle.map {
                 titleView.text = it
             }
         })
 
-        fundViewViewModel.description.observe(this, Observer { maybeDescription: Option<String> ->
-            maybeDescription.map {
-                descriptionView.text = it
-            }
-        })
+        fundViewViewModel.description.observe(
+            viewLifecycleOwner,
+            Observer { maybeDescription: Option<String> ->
+                maybeDescription.map {
+                    descriptionView.text = it
+                }
+            })
 
         val safeArgs: FundViewFragmentArgs by navArgs()
         val selectedFund = safeArgs.selectedFund

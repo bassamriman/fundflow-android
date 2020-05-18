@@ -49,8 +49,7 @@ object DataManager {
 
     // RecurrentTransaction
     private fun recurrentTransactionMap(): Map<TransactionRef, RecurrentTransaction> =
-        recurrentTransactionLedgerContext.recurrentTransactionLedger.transactions.map { it.reference to it }
-            .toMap()
+        recurrentTransactionLedgerContext.recurrentTransactionLedger.transactions
 
     fun loadAllRecurrentTransactions(): List<RecurrentTransaction> =
         recurrentTransactionMap().values.toList()

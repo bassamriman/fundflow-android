@@ -6,13 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import android.widget.TextView
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import arrow.core.Invalid
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.Some
 import arrow.core.Valid
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.monad.flatten
@@ -23,9 +24,11 @@ import com.google.android.material.textfield.TextInputLayout
 import com.rimanware.fundflow_android.DataManager
 import com.rimanware.fundflow_android.R
 import com.rimanware.fundflow_android.databinding.FragmentRecurrentTransactionEditBinding
+import com.rimanware.fundflow_android.ui.common.DateTimeRules
 import com.rimanware.fundflow_android.ui.common.NumberRules
 import com.rimanware.fundflow_android.ui.common.StringRules
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
+import com.rimanware.fundflow_android.ui.common.combineTuple
 import com.rimanware.fundflow_android.ui.common.valideTimeFrequencyExist
 import com.rimanware.fundflow_android.ui.common.viewModelContracts
 import com.rimanware.fundflow_android.ui.common.viewModels
@@ -59,7 +62,7 @@ class RecurrentTransactionEditFragment :
         RECURRENT_TRANSACTION_LIST_VM_KEY
     )
 
-    private val dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    private val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     private val timeFormat = DateTimeFormatter.ISO_LOCAL_TIME
 
     override fun onCreateView(
@@ -80,12 +83,8 @@ class RecurrentTransactionEditFragment :
 
         recurrentTransactionEditViewModel.selectedRecurrentTransaction.observe(
             viewLifecycleOwner,
-            Observer { maybeRecurrentTransaction ->
-                maybeRecurrentTransaction.map {
-                    recurrentTransactionEditViewModel.showRecurrentTransaction(
-                        it
-                    )
-                }
+            Observer {
+                recurrentTransactionEditViewModel.showSelectedRecurrentTransaction(it)
             })
 
         // Set dropdown content
@@ -96,12 +95,15 @@ class RecurrentTransactionEditFragment :
 
         val dropdownFromFund: AutoCompleteTextView = viewBinding.fromFundDropdown
         val dropdownToFund: AutoCompleteTextView = viewBinding.toFundDropdown
+
         val fundFlowValue: TextInputLayout = viewBinding.textFundFlowValue
         val dropdownTimeFrequency: AutoCompleteTextView = viewBinding.timeFrequencyDropdown
-        val fromDateView: TextView = viewBinding.textFromDate
-        val toDateView: TextView = viewBinding.textToDate
-        val fromTimeView: TextView = viewBinding.textFromTime
-        val toTimeView: TextView = viewBinding.textToTime
+
+        val fromDateView: TextInputLayout = viewBinding.textFromDate
+        val fromTimeView: TextInputLayout = viewBinding.textFromTime
+
+        val toDateView: TextInputLayout = viewBinding.textToDate
+        val toTimeView: TextInputLayout = viewBinding.textToTime
 
         // Set content of time frequency dropdown
         val timeFrequencyDropdownAdapter = ArrayAdapter(
@@ -165,29 +167,28 @@ class RecurrentTransactionEditFragment :
             })
 
         // Set from date and time
-        recurrentTransactionEditViewModel.fromLocalDateTime.observe(
+        recurrentTransactionEditViewModel.fromDateTime.observe(
             viewLifecycleOwner,
             Observer
             { maybeValue ->
                 maybeValue.map { value ->
                     val date: String = value.toLocalDate().format(dateFormat)
                     val time: String = value.toLocalTime().format(timeFormat)
-                    fromDateView.text = date
-                    fromTimeView.text = time
+                    fromDateView.editText?.setText(date)
+                    fromTimeView.editText?.setText(time)
                 }
             })
 
         // Set to date and time
-        recurrentTransactionEditViewModel.toLocalDateTime.observe(
+        recurrentTransactionEditViewModel.toDateTime.observe(
             viewLifecycleOwner,
             Observer
             { maybeValue ->
                 maybeValue.map { value ->
-
                     val date: String = value.toLocalDate().format(dateFormat)
                     val time: String = value.toLocalTime().format(timeFormat)
-                    toDateView.text = date
-                    toTimeView.text = time
+                    toDateView.editText?.setText(date)
+                    toTimeView.editText?.setText(time)
                 }
             })
 
@@ -209,11 +210,11 @@ class RecurrentTransactionEditFragment :
         dropdownToFund.doOnTextChanged { inputText, _, _, _ ->
             when (val result = FundRules.validateFundExists(inputText.toString())) {
                 is Invalid -> {
-                    dropdownFromFund.error = result.e.message
+                    dropdownToFund.error = result.e.message
                     recurrentTransactionEditViewModel.setToFundToSave(None)
                 }
                 is Valid -> {
-                    dropdownFromFund.error = null
+                    dropdownToFund.error = null
                     recurrentTransactionEditViewModel.setToFundToSave(result.toOption())
                 }
             }
@@ -246,15 +247,123 @@ class RecurrentTransactionEditFragment :
         dropdownTimeFrequency.doOnTextChanged { inputText, _, _, _ ->
             when (val result = valideTimeFrequencyExist(inputText.toString())) {
                 is Invalid -> {
-                    dropdownFromFund.error = result.e.message
+                    dropdownTimeFrequency.error = result.e.message
                     recurrentTransactionEditViewModel.setFundFlowTimeFrequencyToSave(None)
                 }
                 is Valid -> {
-                    dropdownFromFund.error = null
+                    dropdownTimeFrequency.error = null
                     recurrentTransactionEditViewModel.setFundFlowTimeFrequencyToSave(result.toOption())
                 }
             }
         }
+
+        // From Date Selection ---Bind--> ViewModel
+        fromDateView.editText?.doOnTextChanged { inputText, _, _, _ ->
+            when (val result = DateTimeRules.validateIsDate(dateFormat)(inputText.toString())) {
+                is Invalid -> {
+                    fromDateView.error = result.e.message
+                    recurrentTransactionEditViewModel.setFromDateToSave(None)
+                }
+                is Valid -> {
+                    fromDateView.error = null
+                    recurrentTransactionEditViewModel.setFromDateToSave(result.toOption())
+                }
+            }
+        }
+
+        // From Time Selection ---Bind--> ViewModel
+        fromTimeView.editText?.doOnTextChanged { inputText, _, _, _ ->
+            when (val result = DateTimeRules.validateIsTime(timeFormat)(inputText.toString())) {
+                is Invalid -> {
+                    fromTimeView.error = result.e.message
+                    recurrentTransactionEditViewModel.setFromTimeToSave(None)
+                }
+                is Valid -> {
+                    fromTimeView.error = null
+                    recurrentTransactionEditViewModel.setFromTimeToSave(result.toOption())
+                }
+            }
+        }
+
+        // To Date Selection ---Bind--> ViewModel
+        toDateView.editText?.doOnTextChanged { inputText, _, _, _ ->
+            when (val result = DateTimeRules.validateIsDate(dateFormat)(inputText.toString())) {
+                is Invalid -> {
+                    toDateView.error = result.e.message
+                    recurrentTransactionEditViewModel.setToDateToSave(None)
+                }
+                is Valid -> {
+                    toDateView.error = null
+                    recurrentTransactionEditViewModel.setToDateToSave(result.toOption())
+                }
+            }
+        }
+
+        // To Time Selection ---Bind--> ViewModel
+        toTimeView.editText?.doOnTextChanged { inputText, _, _, _ ->
+            when (val result = DateTimeRules.validateIsTime(timeFormat)(inputText.toString())) {
+                is Invalid -> {
+                    toTimeView.error = result.e.message
+                    recurrentTransactionEditViewModel.setToTimeToSave(None)
+                }
+                is Valid -> {
+                    toTimeView.error = null
+                    recurrentTransactionEditViewModel.setToTimeToSave(result.toOption())
+                }
+            }
+        }
+
+        val fromDateTimeToSaveTuple: LiveData<Pair<Option<LocalDate>, Option<LocalTime>>> =
+            combineTuple(
+                recurrentTransactionEditViewModel.fromDateToSave,
+                recurrentTransactionEditViewModel.fromTimeToSave
+            )
+        fromDateTimeToSaveTuple.observe(
+            viewLifecycleOwner,
+            Observer { maybeFromDateTimeToSaveTuple ->
+                maybeFromDateTimeToSaveTuple.toOption().map {
+                    val (maybeFromDateToSave: Option<LocalDate>, maybeFromTimeToSave: Option<LocalTime>) = it
+                    Option.applicative().map(
+                        maybeFromDateToSave,
+                        maybeFromTimeToSave
+                    ) { (fromDateToSave, fromTimeToSave) ->
+                        recurrentTransactionEditViewModel.setFromDateTimeToSave(
+                            Some(
+                                LocalDateTime.of(
+                                    fromDateToSave,
+                                    fromTimeToSave
+                                )
+                            )
+                        )
+                    }.fix()
+                }
+            })
+
+        val toDateTimeToSaveTuple: LiveData<Pair<Option<LocalDate>, Option<LocalTime>>> =
+            combineTuple(
+                recurrentTransactionEditViewModel.toDateToSave,
+                recurrentTransactionEditViewModel.toTimeToSave
+            )
+        toDateTimeToSaveTuple.observe(
+            viewLifecycleOwner,
+            Observer { maybeToDateTimeToSaveTuple ->
+                maybeToDateTimeToSaveTuple.toOption().map {
+                    val (maybeToDateToSave: Option<LocalDate>, maybeToTimeToSave: Option<LocalTime>) = it
+                    Option.applicative().map(
+                        maybeToDateToSave,
+                        maybeToTimeToSave
+                    ) { (toDateToSave: LocalDate, toTimeToSave: LocalTime) ->
+                        recurrentTransactionEditViewModel.setToDateTimeToSave(
+                            Some(
+                                LocalDateTime.of(
+                                    toDateToSave,
+                                    toTimeToSave
+                                )
+                            )
+                        )
+                    }.fix()
+                }
+            })
 
         val safeArgs: RecurrentTransactionEditFragmentArgs by navArgs()
         val selectedRecurrentTransactionRef: String = safeArgs.selectedRecurrentTransaction
@@ -282,35 +391,27 @@ class RecurrentTransactionEditFragment :
 
         val maybeFromFundToSave: Option<Fund> =
             recurrentTransactionEditViewModel.fromFundToSave.value.toOption().flatten()
-        val maybeSelectedToFund: Option<Fund> =
+        val maybeToFundToSave: Option<Fund> =
             recurrentTransactionEditViewModel.toFundToSave.value.toOption().flatten()
-        val maybeSelectedFundFlowTimeFrequency: Option<TimeFrequency> =
+
+        val maybeFundFlowTimeFrequencyToSave: Option<TimeFrequency> =
             recurrentTransactionEditViewModel.fundFlowTimeFrequencyToSave.value.toOption().flatten()
-        val maybeFundFlowValue: Option<BigDecimal> =
+        val maybeFundFlowValueToSave: Option<BigDecimal> =
             recurrentTransactionEditViewModel.fundFlowValueToSave.value.toOption().flatten()
 
-        val fromDateView: TextView = viewBinding.textFromDate
-        val selectedFromDate: LocalDate =
-            LocalDate.parse(fromDateView.text.toString(), dateFormat)
-
-        val toDateView: TextView = viewBinding.textToDate
-        val selectedToDate = LocalDate.parse(toDateView.text.toString(), dateFormat)
-
-        val fromTimeView: TextView = viewBinding.textFromTime
-        val selectedFromTime = LocalTime.parse(fromTimeView.text.toString(), timeFormat)
-
-        val toTimeView: TextView = viewBinding.textToTime
-        val selectedToTime = LocalTime.parse(toTimeView.text.toString(), timeFormat)
-
-        val selectedFromDateTime = LocalDateTime.of(selectedFromDate, selectedFromTime)
-        val selectedToDateTime = LocalDateTime.of(selectedToDate, selectedToTime)
+        val maybeFromDateTimeToSave: Option<LocalDateTime> =
+            recurrentTransactionEditViewModel.fromDateTimeToSave.value.toOption().flatten()
+        val maybeToDateTimeToSave: Option<LocalDateTime> =
+            recurrentTransactionEditViewModel.toDateTimeToSave.value.toOption().flatten()
 
         Option.applicative().map(
             maybeFromFundToSave,
-            maybeSelectedToFund,
-            maybeSelectedFundFlowTimeFrequency,
-            maybeFundFlowValue
-        ) { (selectedFromFund, selectedToFund, selectedFundFlowTimeFrequency, fundFlowValue) ->
+            maybeToFundToSave,
+            maybeFundFlowTimeFrequencyToSave,
+            maybeFundFlowValueToSave,
+            maybeFromDateTimeToSave,
+            maybeToDateTimeToSave
+        ) { (selectedFromFund, selectedToFund, selectedFundFlowTimeFrequency, fundFlowValue, fromDateTimeToSave, toDateTimeToSave) ->
             maybeSelectedRecurrentTransaction.map { selectedRecurrentTransaction ->
                 selectedRecurrentTransaction.copy(
                     quantification = RecurrentTransactionQuantification(
@@ -321,8 +422,8 @@ class RecurrentTransactionEditFragment :
                     ),
                     details = RecurrentTransactionDetail(
                         DateTimeInterval(
-                            selectedFromDateTime,
-                            selectedToDateTime
+                            fromDateTimeToSave,
+                            toDateTimeToSave
                         )
                     ),
                     transactionCoordinates = TransactionCoordinates(
@@ -340,8 +441,8 @@ class RecurrentTransactionEditFragment :
                     ),
                     RecurrentTransactionDetail(
                         DateTimeInterval(
-                            selectedFromDateTime,
-                            selectedToDateTime
+                            fromDateTimeToSave,
+                            toDateTimeToSave
                         )
                     ),
                     TransactionCoordinates(
