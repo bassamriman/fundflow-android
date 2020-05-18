@@ -7,7 +7,10 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
-import com.rimanware.fundflow_android.ui.common.combineTuple
+import com.rimanware.fundflow_android.ui.common.combineTriple
+import common.unit.Daily
+import common.unit.TimeFrequency
+import fundflow.Flow
 import fundflow.Fund
 import fundflow.ledgers.CombinableRecurrentTransactionFundView
 import java.math.BigDecimal
@@ -34,32 +37,41 @@ class FundFlowCardViewViewModel : ViewModel() {
     }
 
     private val _inFlow by lazy {
-        MutableLiveData<Option<BigDecimal>>().apply { value = Some(BigDecimal.ZERO) }
+        MutableLiveData<Option<Flow>>().apply { value = Some(Flow(BigDecimal.ZERO, Daily)) }
     }
-    val inFlow: LiveData<Option<BigDecimal>> by lazy { _inFlow }
+    val inFlow: LiveData<Option<Flow>> by lazy { _inFlow }
 
     private val _fundFlow by lazy {
-        MutableLiveData<Option<BigDecimal>>().apply { value = Some(BigDecimal.ZERO) }
+        MutableLiveData<Option<Flow>>().apply { value = Some(Flow(BigDecimal.ZERO, Daily)) }
     }
-    val fundFlow: LiveData<Option<BigDecimal>> by lazy { _fundFlow }
+    val fundFlow: LiveData<Option<Flow>> by lazy { _fundFlow }
 
     private val _outFlow by lazy {
-        MutableLiveData<Option<BigDecimal>>().apply { value = Some(BigDecimal.ZERO) }
+        MutableLiveData<Option<Flow>>().apply { value = Some(Flow(BigDecimal.ZERO, Daily)) }
     }
-    val outFlow: LiveData<Option<BigDecimal>> by lazy { _outFlow }
+    val outFlow: LiveData<Option<Flow>> by lazy { _outFlow }
 
     private val _dateTimeToComputeFlowAt by lazy {
         MutableLiveData<Option<LocalDateTime>>().apply { value = None }
     }
     val dateTimeToComputeFlowAt: LiveData<Option<LocalDateTime>> by lazy { _dateTimeToComputeFlowAt }
 
-    val computationDateTimeAndFundTuple: LiveData<Pair<Option<Fund>, Option<LocalDateTime>>> =
-        combineTuple(maybeSelectedFund, dateTimeToComputeFlowAt)
-
     private val _selectedFundFlowView by lazy {
         MutableLiveData<Option<CombinableRecurrentTransactionFundView>>().apply { value = None }
     }
     val selectedFundFlowView: LiveData<Option<CombinableRecurrentTransactionFundView>> by lazy { _selectedFundFlowView }
+
+    private val _fundFlowTimeFrequency by lazy {
+        MutableLiveData<Option<TimeFrequency>>().apply { value = Some(Daily) }
+    }
+    val fundFlowTimeFrequency: LiveData<Option<TimeFrequency>> by lazy { _fundFlowTimeFrequency }
+
+    val computationDateTimeAndFundTriple: LiveData<Triple<Option<Fund>, Option<LocalDateTime>, Option<TimeFrequency>>> =
+        combineTriple(maybeSelectedFund, dateTimeToComputeFlowAt, fundFlowTimeFrequency)
+
+    fun setFundFlowTimeFrequency(maybeTimeFrequency: Option<TimeFrequency>) {
+        _fundFlowTimeFrequency.value = maybeTimeFrequency
+    }
 
     fun setDateTimeToComputeFlowAt(computeAt: Option<LocalDateTime>) {
         _dateTimeToComputeFlowAt.value = computeAt
@@ -71,13 +83,13 @@ class FundFlowCardViewViewModel : ViewModel() {
 
     fun showFund(maybeFundFlowView: Option<CombinableRecurrentTransactionFundView>) {
         maybeFundFlowView.map {
-            _inFlow.value = Some(it.fundSummaries.summary.incomingFlow.flow.value)
-            _fundFlow.value = Some(it.fundSummaries.summary.fundFlow.flow.value)
-            _outFlow.value = Some(it.fundSummaries.summary.outgoingFlow.flow.value)
+            _inFlow.value = Some(it.fundSummaries.summary.incomingFlow.flow)
+            _fundFlow.value = Some(it.fundSummaries.summary.fundFlow.flow)
+            _outFlow.value = Some(it.fundSummaries.summary.outgoingFlow.flow)
         }.getOrElse {
-            _inFlow.value = Some(BigDecimal.ZERO)
-            _fundFlow.value = Some(BigDecimal.ZERO)
-            _outFlow.value = Some(BigDecimal.ZERO)
+            _inFlow.value = Some(Flow(BigDecimal.ZERO, Daily))
+            _fundFlow.value = Some(Flow(BigDecimal.ZERO, Daily))
+            _outFlow.value = Some(Flow(BigDecimal.ZERO, Daily))
         }
     }
 }

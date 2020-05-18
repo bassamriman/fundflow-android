@@ -2,6 +2,7 @@ package com.rimanware.fundflow_android
 
 import arrow.core.Option
 import arrow.core.getOption
+import common.unit.TimeFrequency
 import fundflow.Fund
 import fundflow.FundRef
 import fundflow.ledgers.CombinableRecurrentTransactionFundView
@@ -29,11 +30,12 @@ object DataManager {
 
     fun loadFundFlowView(
         ref: FundRef,
-        dateTime: LocalDateTime
+        dateTime: LocalDateTime,
+        timeFrequency: TimeFrequency
     ): Option<CombinableRecurrentTransactionFundView> =
         RecurrentTransactionLedgerContextAPI.run {
             LedgerContextAPI.run {
-                val a = recurrentTransactionLedgerContext.flowAt(dateTime)
+                val a = recurrentTransactionLedgerContext.flowAt(dateTime, timeFrequency)
                     .view(ref, CombinableRecurrentTransactionFundViewFactory)
                 a
             }

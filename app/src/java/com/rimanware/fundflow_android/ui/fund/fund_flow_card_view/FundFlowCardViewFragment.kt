@@ -4,12 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.TextView
 import androidx.core.util.Pair
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
+import arrow.core.Invalid
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.Valid
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.monad.flatten
 import arrow.core.fix
@@ -18,18 +23,23 @@ import arrow.core.toOption
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.rimanware.fundflow_android.DataManager
+import com.rimanware.fundflow_android.R
 import com.rimanware.fundflow_android.databinding.FragmentFundFlowCardBinding
 import com.rimanware.fundflow_android.ui.common.GLOBAL_VM_KEY
 import com.rimanware.fundflow_android.ui.common.VM_KEY
 import com.rimanware.fundflow_android.ui.common.ViewBindingFragment
 import com.rimanware.fundflow_android.ui.common.combineTuple
 import com.rimanware.fundflow_android.ui.common.registerViewModelContract
+import com.rimanware.fundflow_android.ui.common.valideTimeFrequencyExist
 import com.rimanware.fundflow_android.ui.common.viewModelContracts
 import com.rimanware.fundflow_android.ui.common.viewModels
 import com.rimanware.fundflow_android.ui.core.AppViewModel
 import com.rimanware.fundflow_android.ui.core.GlobalDateTimeProviderModelViewContract
 import com.rimanware.fundflow_android.ui.fund.fund_view.SelectedFundViewModelContract
-import java.math.BigDecimal
+import common.unit.Daily
+import common.unit.TimeFrequency
+import fundflow.Flow
+import java.math.RoundingMode
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Calendar
@@ -108,33 +118,59 @@ class FundFlowCardViewFragment :
             picker.show(childFragmentManager, picker.toString())
         }
 
+        val dropdownTimeFrequency: AutoCompleteTextView = viewBinding.timeFrequencyDropdown
+        dropdownTimeFrequency.setText(
+            Daily.name,
+            false
+        )
+        // Set content of time frequency dropdown
+        val timeFrequencyDropdownAdapter = ArrayAdapter(
+            requireContext(),
+            R.layout.dropdown_menu_popup_item,
+            TimeFrequency.all.map { it.name }
+        )
+        dropdownTimeFrequency.setAdapter(timeFrequencyDropdownAdapter)
+        // FundFlow Time Frequency Dropdown Selection ---Bind--> ViewModel
+        dropdownTimeFrequency.doOnTextChanged { inputText, _, _, _ ->
+            when (val result = valideTimeFrequencyExist(inputText.toString())) {
+                is Invalid -> {
+                    dropdownTimeFrequency.error = result.e.message
+                    fundCardViewViewModel.setFundFlowTimeFrequency(Some(Daily))
+                }
+                is Valid -> {
+                    dropdownTimeFrequency.error = null
+                    fundCardViewViewModel.setFundFlowTimeFrequency(result.toOption())
+                }
+            }
+        }
+
         val inFlowView: TextView = viewBinding.textInFlowValue
         val fundFlowView: TextView = viewBinding.textFundFlowValue
         val outFlowView: TextView = viewBinding.textOutFlowValue
 
         fundCardViewViewModel.inFlow.observe(
             viewLifecycleOwner,
-            Observer { maybeInFlow: Option<BigDecimal> ->
+            Observer { maybeInFlow: Option<Flow> ->
                 maybeInFlow.map {
-                    val test = "$${it.setScale(2)}/Day"
+                    val test = "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
                     inFlowView.text = test
                 }
             })
 
         fundCardViewViewModel.fundFlow.observe(
             viewLifecycleOwner,
-            Observer { maybeFundFlow: Option<BigDecimal> ->
+            Observer { maybeFundFlow: Option<Flow> ->
                 maybeFundFlow.map {
-                    val test = "$${it.setScale(2)}/Day"
+                    val test = "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
                     fundFlowView.text = test
                 }
             })
 
         fundCardViewViewModel.outFlow.observe(
             viewLifecycleOwner,
-            Observer { maybeOutFlow: Option<BigDecimal> ->
+            Observer { maybeOutFlow: Option<Flow> ->
                 maybeOutFlow.map {
-                    val test = "$${it.setScale(2)}/Day"
+                    val test = "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
                     outFlowView.text = test
                 }
             })
@@ -166,18 +202,20 @@ class FundFlowCardViewFragment :
                 }
             })
 
-        fundCardViewViewModel.computationDateTimeAndFundTuple.observe(
+        fundCardViewViewModel.computationDateTimeAndFundTriple.observe(
             viewLifecycleOwner,
-            Observer { maybeComputationDateTimeAndFundTuple ->
-                val maybeFundFlowView = maybeComputationDateTimeAndFundTuple.toOption().map {
-                    val (maybeFund, maybeLocalDateTime) = it
+            Observer { maybeComputationDateTimeAndFundTriple ->
+                val maybeFundFlowView = maybeComputationDateTimeAndFundTriple.toOption().map {
+                    val (maybeFund, maybeLocalDateTime, maybeTimeFrequency) = it
                     Option.applicative().map(
                         maybeFund,
-                        maybeLocalDateTime
-                    ) { (previouslySelectedFund, selectedDateTime) ->
+                        maybeLocalDateTime,
+                        maybeTimeFrequency
+                    ) { (previouslySelectedFund, selectedDateTime, timeFrequency) ->
                         val a = DataManager.loadFundFlowView(
                             previouslySelectedFund.reference,
-                            selectedDateTime
+                            selectedDateTime,
+                            timeFrequency
                         )
                         a
                     }.fix().flatten()
