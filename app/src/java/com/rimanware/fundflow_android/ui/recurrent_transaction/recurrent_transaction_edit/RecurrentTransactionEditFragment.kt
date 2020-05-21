@@ -44,12 +44,12 @@ import fundflow.Fund
 import fundflow.ledgers.RecurrentTransaction
 import fundflow.ledgers.RecurrentTransactionDetail
 import fundflow.ledgers.RecurrentTransactionQuantification
+import ledger.TransactionCoordinates
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import ledger.TransactionCoordinates
 
 class RecurrentTransactionEditFragment :
     ViewBindingFragment<FragmentRecurrentTransactionEditBinding>() {
@@ -109,7 +109,7 @@ class RecurrentTransactionEditFragment :
         val timeFrequencyDropdownAdapter = ArrayAdapter(
             requireContext(),
             R.layout.dropdown_menu_popup_item,
-            TimeFrequency.all.map { it.name }
+            TimeFrequency.all().map { it.name }
         )
         dropdownTimeFrequency.setAdapter(timeFrequencyDropdownAdapter)
 
@@ -385,6 +385,7 @@ class RecurrentTransactionEditFragment :
             recurrentTransactionEditViewModel.selectedRecurrentTransaction.value.toOption()
                 .flatten()
         )
+        recurrentTransactionEditViewModel.clearToSave()
     }
 
     private fun saveRecurrentTransaction(maybeSelectedRecurrentTransaction: Option<RecurrentTransaction>) {

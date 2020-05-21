@@ -25,7 +25,8 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="textCapWords"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -40,7 +41,6 @@
         android:ems="10"
         android:gravity="start|top"
         android:hint="Fund Text"
-        android:inputType="textMultiLine"
         app:counterEnabled="true"
         app:counterMaxLength="120"
         app:errorEnabled="true"
@@ -50,7 +50,8 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine|textCapSentences"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 

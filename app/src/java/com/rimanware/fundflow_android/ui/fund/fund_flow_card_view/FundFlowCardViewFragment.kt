@@ -123,11 +123,12 @@ class FundFlowCardViewFragment :
             Daily.name,
             false
         )
+
         // Set content of time frequency dropdown
         val timeFrequencyDropdownAdapter = ArrayAdapter(
             requireContext(),
             R.layout.dropdown_menu_popup_item,
-            TimeFrequency.all.map { it.name }
+            TimeFrequency.all().map { it.name }
         )
         dropdownTimeFrequency.setAdapter(timeFrequencyDropdownAdapter)
         // FundFlow Time Frequency Dropdown Selection ---Bind--> ViewModel
@@ -152,7 +153,8 @@ class FundFlowCardViewFragment :
             viewLifecycleOwner,
             Observer { maybeInFlow: Option<Flow> ->
                 maybeInFlow.map {
-                    val test = "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
+                    val test =
+                        "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
                     inFlowView.text = test
                 }
             })
@@ -161,7 +163,8 @@ class FundFlowCardViewFragment :
             viewLifecycleOwner,
             Observer { maybeFundFlow: Option<Flow> ->
                 maybeFundFlow.map {
-                    val test = "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
+                    val test =
+                        "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
                     fundFlowView.text = test
                 }
             })
@@ -170,7 +173,8 @@ class FundFlowCardViewFragment :
             viewLifecycleOwner,
             Observer { maybeOutFlow: Option<Flow> ->
                 maybeOutFlow.map {
-                    val test = "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
+                    val test =
+                        "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
                     outFlowView.text = test
                 }
             })
@@ -212,12 +216,11 @@ class FundFlowCardViewFragment :
                         maybeLocalDateTime,
                         maybeTimeFrequency
                     ) { (previouslySelectedFund, selectedDateTime, timeFrequency) ->
-                        val a = DataManager.loadFundFlowView(
+                        DataManager.loadFundFlowView(
                             previouslySelectedFund.reference,
                             selectedDateTime,
                             timeFrequency
                         )
-                        a
                     }.fix().flatten()
                 }.flatten()
                 fundCardViewViewModel.selectFunFlowView(maybeFundFlowView)

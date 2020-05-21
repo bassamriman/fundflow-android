@@ -31,11 +31,11 @@ object FundEditValidation {
     ): Unit = when (val result = validateFundTitle(newTitle, oldTitle)) {
         is Invalid -> {
             view.error = result.e.message
-            fundEditViewModel.setTitleInput(None)
+            fundEditViewModel.setTitleToSave(None)
         }
         is Valid -> {
             view.error = null
-            fundEditViewModel.setTitleInput(result.toOption())
+            fundEditViewModel.setTitleToSave(result.toOption())
         }
     }
 
@@ -51,11 +51,11 @@ object FundEditValidation {
     ): Unit = when (val result = validateFundDescription(newDescription)) {
         is Invalid -> {
             view.error = result.e.message
-            fundEditViewModel.setValidDescriptionInput(None)
+            fundEditViewModel.setValidDescriptionToSave(None)
         }
         is Valid -> {
             view.error = null
-            fundEditViewModel.setValidDescriptionInput(result.toOption())
+            fundEditViewModel.setValidDescriptionToSave(result.toOption())
         }
     }
 }

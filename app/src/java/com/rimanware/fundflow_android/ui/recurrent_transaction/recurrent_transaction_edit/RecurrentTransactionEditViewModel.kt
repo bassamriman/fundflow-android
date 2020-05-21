@@ -82,7 +82,6 @@ class RecurrentTransactionEditViewModel : ViewModel() {
             _toDateTime.value = LocalDateTime.now().toOption()
             _fundFlowValue.value = None
             _fundFlowTimeFrequency.value = None
-            resetToSave()
         }
     }
 
@@ -186,7 +185,7 @@ class RecurrentTransactionEditViewModel : ViewModel() {
         _toDateTimeToSave.value = maybeLocalDateTime
     }
 
-    fun resetToSave() {
+    fun clearToSave() {
         _fromFundToSave.value = None
         _toFundToSave.value = None
         _fundFlowValueToSave.value = None

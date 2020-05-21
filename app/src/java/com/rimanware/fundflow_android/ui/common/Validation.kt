@@ -39,7 +39,7 @@ object TimeFrequencyDoesntExist : ValidationError {
 }
 
 fun valideTimeFrequencyExist(name: String): Validated<ValidationError, TimeFrequency> =
-    TimeFrequency.all.find { it.name == name }.toOption().map {
+    TimeFrequency.all().find { it.name == name }.toOption().map {
         Valid(it)
     }.getOrElse { Invalid(TimeFrequencyDoesntExist) }
 

@@ -37,23 +37,28 @@ class FundEditViewModel : ViewModel() {
     }
 
     // User Input
-    private val _validTitleInput by lazy {
+    private val _validTitleToSave by lazy {
         MutableLiveData<Option<String>>().apply { value = None }
     }
 
-    val validTitleInput: LiveData<Option<String>> by lazy { _validTitleInput }
+    val validTitleToSave: LiveData<Option<String>> by lazy { _validTitleToSave }
 
-    fun setTitleInput(maybeTitle: Option<String>) {
-        _validTitleInput.value = maybeTitle
+    fun setTitleToSave(maybeTitle: Option<String>) {
+        _validTitleToSave.value = maybeTitle
     }
 
-    private val _validDescriptionInput by lazy {
+    private val _validDescriptionToSave by lazy {
         MutableLiveData<Option<String>>().apply { value = Some("") }
     }
 
-    val validDescriptionInput: LiveData<Option<String>> by lazy { _validDescriptionInput }
+    val validDescriptionToSave: LiveData<Option<String>> by lazy { _validDescriptionToSave }
 
-    fun setValidDescriptionInput(maybeDescription: Option<String>) {
-        _validDescriptionInput.value = maybeDescription
+    fun setValidDescriptionToSave(maybeDescription: Option<String>) {
+        _validDescriptionToSave.value = maybeDescription
+    }
+
+    fun clearToSave() {
+        _validTitleToSave.value = None
+        _validDescriptionToSave.value = None
     }
 }

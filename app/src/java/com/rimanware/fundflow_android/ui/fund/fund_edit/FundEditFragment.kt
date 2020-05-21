@@ -96,13 +96,14 @@ class FundEditFragment : ViewBindingFragment<FragmentFundEditBinding>() {
     override fun onPause() {
         super.onPause()
         saveFund(fundEditViewModel.selectedFund.value.toOption().flatten())
+        fundEditViewModel.clearToSave()
     }
 
     private fun saveFund(maybeSelectedFund: Option<Fund>) {
         val maybeValidTitle: Option<String> =
-            fundEditViewModel.validTitleInput.value.toOption().flatten()
+            fundEditViewModel.validTitleToSave.value.toOption().flatten()
         val maybeValidDescription: Option<String> =
-            fundEditViewModel.validDescriptionInput.value.toOption().flatten()
+            fundEditViewModel.validDescriptionToSave.value.toOption().flatten()
 
         Option.applicative().map(
             maybeValidTitle,

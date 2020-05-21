@@ -34,13 +34,11 @@ class FundListAdapter : ListAdapter<Fund, FundListViewHolder>(
     override fun onBindViewHolder(holder: FundListViewHolder, position: Int) {
         val fund = getItem(position)
         holder.textTitle?.text = fund.name
-        holder.textDesciption?.text = fund.description
     }
 }
 
 class FundListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val textTitle = itemView.findViewById<TextView?>(R.id.testTitle)
-    val textDesciption = itemView.findViewById<TextView?>(R.id.textDescription)
 
     init {
         itemView.setOnClickListener {
