@@ -77,7 +77,7 @@ class FundFlowCardViewViewModel : ViewModel() {
         _dateTimeToComputeFlowAt.value = computeAt
     }
 
-    fun selectFunFlowView(selected: Option<CombinableRecurrentTransactionFundView>) {
+    fun selectFundFlowView(selected: Option<CombinableRecurrentTransactionFundView>) {
         _selectedFundFlowView.value = selected
     }
 

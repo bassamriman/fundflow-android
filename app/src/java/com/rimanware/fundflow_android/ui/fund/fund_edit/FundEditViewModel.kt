@@ -59,6 +59,6 @@ class FundEditViewModel : ViewModel() {
 
     fun clearToSave() {
         _validTitleToSave.value = None
-        _validDescriptionToSave.value = None
+        _validDescriptionToSave.value = Some("")
     }
 }

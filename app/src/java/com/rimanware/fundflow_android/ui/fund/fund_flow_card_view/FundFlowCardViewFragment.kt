@@ -154,7 +154,7 @@ class FundFlowCardViewFragment :
             Observer { maybeInFlow: Option<Flow> ->
                 maybeInFlow.map {
                     val test =
-                        "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
+                        "$${it.value.setScale(2, RoundingMode.HALF_EVEN)}"
                     inFlowView.text = test
                 }
             })
@@ -164,7 +164,7 @@ class FundFlowCardViewFragment :
             Observer { maybeFundFlow: Option<Flow> ->
                 maybeFundFlow.map {
                     val test =
-                        "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
+                        "$${it.value.setScale(2, RoundingMode.HALF_EVEN)}"
                     fundFlowView.text = test
                 }
             })
@@ -174,7 +174,7 @@ class FundFlowCardViewFragment :
             Observer { maybeOutFlow: Option<Flow> ->
                 maybeOutFlow.map {
                     val test =
-                        "$${it.value.setScale(2, RoundingMode.HALF_EVEN)} ${it.unit.perAlias}"
+                        "$${it.value.setScale(2, RoundingMode.HALF_EVEN)}"
                     outFlowView.text = test
                 }
             })
@@ -223,7 +223,7 @@ class FundFlowCardViewFragment :
                         )
                     }.fix().flatten()
                 }.flatten()
-                fundCardViewViewModel.selectFunFlowView(maybeFundFlowView)
+                fundCardViewViewModel.selectFundFlowView(maybeFundFlowView)
             })
 
         fundCardViewViewModel.selectedFundFlowView.observe(
